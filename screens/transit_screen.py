@@ -1,10 +1,11 @@
 """
 transit_screen.py — Shows current destination while robot is moving.
 
-Contains:
-  - Destination label ("Heading to Table X")
-  - Small face widget (focused mood)
-  - Stops remaining indicator (if multi-stop delivery)
+Contains ONLY:
+  - Destination line ("Heading to Table X")
+  - FaceWidget (focused mood)
+
+No status bar, no extra info, no debug text.
 """
 
 from PyQt5.QtCore import Qt
@@ -21,7 +22,6 @@ class TransitScreen(QWidget):
     │                             │
     │         [😐]                │  ← focused face
     │                             │
-    │    2 more stops after this  │
     │                             │
     └─────────────────────────────┘
     """
@@ -32,10 +32,11 @@ class TransitScreen(QWidget):
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
+        layout.setSpacing(30)
 
-        # --- Destination heading ---
+        # --- Destination heading (functional feedback, not debug) ---
         self.destination_label = QLabel("Heading to...", self)
         self.destination_label.setAlignment(Qt.AlignCenter)
         self.destination_label.setStyleSheet("""
@@ -48,10 +49,10 @@ class TransitScreen(QWidget):
         layout.addWidget(self.destination_label)
 
         # --- Focused face ---
-        self.face = FaceWidget(size=150, parent=self)
+        self.face = FaceWidget(size=180, parent=self)
         layout.addWidget(self.face, alignment=Qt.AlignCenter)
 
-        # --- Stops remaining ---
+        # --- Stops remaining (only shown if multi-stop) ---
         self.stops_label = QLabel("", self)
         self.stops_label.setAlignment(Qt.AlignCenter)
         self.stops_label.setStyleSheet("""

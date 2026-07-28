@@ -10,7 +10,6 @@ It only knows about itself. Screens listen to Controller signals.
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
-# Import constants (Controller can read config, but never writes to UI)
 from config import RACK_COUNT, TABLE_COUNT
 
 
@@ -23,7 +22,7 @@ class Controller(QObject):
     │  assignment  → waiter selecting racks & tables          │
     │  navigating  → robot moving to a table                  │
     │  arrived     → at table, waiting for customer pickup    │
-    │  returning   → heading back to dock                     │
+    │  returning   → heading back to dock                   │
     │  settings    → admin config screen (separate flow)      │
     └─────────────────────────────────────────────────────────┘
     """
@@ -31,16 +30,9 @@ class Controller(QObject):
     # ═══════════════════════════════════════════════════════
     # SIGNALS — these are how the Controller talks to the UI
     # ═══════════════════════════════════════════════════════
-    # Emitted whenever the main state changes (idle → assignment, etc.)
     state_changed = pyqtSignal(str)
-
-    # Emitted when the robot's "mood" changes (neutral, happy, focused...)
     mood_changed = pyqtSignal(str)
-
-    # Emitted when the stops list is modified (add/remove/clear)
     stops_updated = pyqtSignal(list)
-
-    # Emitted when we move to the next stop in the queue
     current_stop_changed = pyqtSignal(dict)
 
     # ═══════════════════════════════════════════════════════
@@ -49,45 +41,39 @@ class Controller(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # --- Internal state (private — use methods to change) ---
         self._state = "idle"
         self._mood = "neutral"
-        self._stops = []          # list of {"rack": int, "table": int}
+        self._stops = []
         self._current_stop_index = 0
+        self._pre_settings_state = "idle"  # remember where we were before settings
 
     # ═══════════════════════════════════════════════════════
-    # PROPERTIES — read-only from outside via these getters
+    # PROPERTIES
     # ═══════════════════════════════════════════════════════
     @property
     def state(self):
-        """Current state machine state (string)."""
         return self._state
 
     @property
     def mood(self):
-        """Current face mood (string)."""
         return self._mood
 
     @property
     def stops(self):
-        """Copy of the stops list (safe to read, won't mutate internal)."""
         return list(self._stops)
 
     @property
     def current_stop(self):
-        """The stop we're currently navigating to, or None."""
         if 0 <= self._current_stop_index < len(self._stops):
             return self._stops[self._current_stop_index]
         return None
 
     @property
     def has_more_stops(self):
-        """True if there are stops after the current one."""
         return self._current_stop_index < len(self._stops) - 1
 
     # ═══════════════════════════════════════════════════════
     # STATE TRANSITION METHODS
-    # Each method validates the transition, updates state, emits signal
     # ═══════════════════════════════════════════════════════
 
     def to_idle(self):
@@ -102,7 +88,7 @@ class Controller(QObject):
     def to_assignment(self):
         """Waiter long-pressed the face — open assignment screen."""
         self._state = "assignment"
-        self._stops = []          # fresh assignment each time
+        self._stops = []
         self._current_stop_index = 0
         self.stops_updated.emit(self._stops)
         self.state_changed.emit("assignment")
@@ -124,7 +110,7 @@ class Controller(QObject):
     def start_delivery(self):
         """Waiter tapped "Start" — begin navigating to first stop."""
         if not self._stops:
-            return                  # safety: can't start with no stops
+            return
         self._current_stop_index = 0
         self._state = "navigating"
         self._set_mood("focused")
@@ -156,23 +142,16 @@ class Controller(QObject):
 
     def to_settings(self):
         """Open settings (gear icon tapped, PIN already verified)."""
+        self._pre_settings_state = self._state
         self._state = "settings"
         self.state_changed.emit("settings")
 
     def return_from_settings(self):
         """Back button pressed in settings — return to previous state."""
-        # Settings is a modal overlay; we return to whatever state we were in
-        if self._stops and self._current_stop_index < len(self._stops):
-            # We were in the middle of a delivery
-            if self._state == "settings":
-                # Determine where we were before settings
-                if self.current_stop and self._state not in ["idle", "assignment"]:
-                    pass  # keep current underlying state
-        # For simplicity: if no active delivery, go idle
-        if not self._stops:
+        if self._pre_settings_state == "idle" or not self._stops:
             self.to_idle()
         else:
-            # Re-emit current state so MainWindow switches back
+            self._state = self._pre_settings_state
             self.state_changed.emit(self._state)
 
     def set_mood(self, mood):
@@ -183,7 +162,6 @@ class Controller(QObject):
     # PRIVATE HELPERS
     # ═══════════════════════════════════════════════════════
     def _set_mood(self, mood):
-        """Internal: change mood and emit signal only if different."""
         if self._mood != mood:
             self._mood = mood
             self.mood_changed.emit(mood)

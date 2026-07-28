@@ -1,14 +1,13 @@
 """
 arrived_screen.py — Customer pickup screen.
 
-Contains:
-  - Pickup instruction ("Please collect from Rack N")
-  - Small happy face
-  - "I'm done" confirm button
+Contains ONLY:
+  - Greeting message ("Your order has arrived — please collect it")
+  - FaceWidget (happy mood)
+  - "Done" button
   - Reminder banner (hidden, shown after 45s timeout)
 
-The 45s timer is managed by MainWindow (not this screen) so that
-screen transitions don't accidentally kill the timer.
+No status bar, no rack numbers exposed to customer (internal detail).
 """
 
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -21,7 +20,8 @@ class ArrivedScreen(QWidget):
     """
     ┌─────────────────────────────┐
     │                             │
-    │  Please collect from Rack 2 │
+    │  Your order has arrived     │
+    │  Please collect it          │
     │                             │
     │         [😊]                │
     │                             │
@@ -40,28 +40,39 @@ class ArrivedScreen(QWidget):
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
+        layout.setSpacing(25)
 
-        # --- Pickup instruction ---
-        self.pickup_label = QLabel("Please collect your item", self)
-        self.pickup_label.setAlignment(Qt.AlignCenter)
-        self.pickup_label.setStyleSheet("""
+        # --- Greeting message ---
+        self.greeting_label = QLabel("Your order has arrived", self)
+        self.greeting_label.setAlignment(Qt.AlignCenter)
+        self.greeting_label.setStyleSheet("""
             QLabel {
                 color: #fff;
                 font-size: 28px;
                 font-weight: bold;
             }
         """)
-        layout.addWidget(self.pickup_label)
+        layout.addWidget(self.greeting_label)
+
+        self.sub_label = QLabel("Please collect it", self)
+        self.sub_label.setAlignment(Qt.AlignCenter)
+        self.sub_label.setStyleSheet("""
+            QLabel {
+                color: #aaa;
+                font-size: 20px;
+            }
+        """)
+        layout.addWidget(self.sub_label)
 
         # --- Happy face ---
-        self.face = FaceWidget(size=150, parent=self)
+        self.face = FaceWidget(size=180, parent=self)
         layout.addWidget(self.face, alignment=Qt.AlignCenter)
 
         # --- Confirm button ---
         self.confirm_btn = QPushButton("✓ I'm Done", self)
-        self.confirm_btn.setFixedSize(200, 70)
+        self.confirm_btn.setFixedSize(220, 70)
         self.confirm_btn.setStyleSheet("""
             QPushButton {
                 background-color: #2ecc71;
@@ -108,10 +119,6 @@ class ArrivedScreen(QWidget):
     def on_exit(self):
         """Clean up when leaving."""
         self.reminder_banner.hide()
-
-    def set_rack(self, rack_number):
-        """Update the pickup instruction with rack number."""
-        self.pickup_label.setText(f"Please collect from Rack {rack_number}")
 
     def show_reminder(self):
         """Show the worry banner (called by MainWindow after 45s)."""

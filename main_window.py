@@ -6,13 +6,13 @@ Architecture rule:
   - When state changes, it calls on_exit() on old screen, setCurrentWidget(), on_enter() on new screen
   - Screens NEVER talk to each other directly
   - This file has ZERO business logic — just routing
+  - NO global top bar — each screen owns its own chrome (or none at all)
 """
-from PyQt5.QtWidgets import QShortcut
-from PyQt5.QtGui import QKeySequence
+
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QStackedWidget, QPushButton
+    QMainWindow, QWidget, QVBoxLayout,
+    QStackedWidget
 )
 
 from controller import Controller
@@ -23,20 +23,21 @@ from screens import (
 from widgets.face_widget import FaceWidget
 from config import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN,
-    ARRIVAL_REMINDER_MS, ADMIN_PIN
+    ARRIVAL_REMINDER_MS
 )
 
 
 class MainWindow(QMainWindow):
     """
     ┌─────────────────────────────────────────┐
-    │  [🤖]  AGV Delivery Bot          [⚙️]  │  ← status bar
-    │─────────────────────────────────────────│
     │                                         │
-    │         [ ACTIVE SCREEN ]               │  ← QStackedWidget
+    │         [ ACTIVE SCREEN ]               │  ← QStackedWidget (full area)
     │                                         │
     │                                         │
     └─────────────────────────────────────────┘
+
+    No global top bar. Idle screen is FaceWidget only, fullscreen.
+    Settings gear lives on AssignmentScreen (staff-facing).
     """
 
     def __init__(self, controller: Controller, parent=None):
@@ -51,9 +52,6 @@ class MainWindow(QMainWindow):
         self._setup_ui()
         self._connect_signals()
         self._setup_reminder_timer()
-        # Development shortcut
-        self.exit_shortcut = QShortcut(QKeySequence("Esc"), self)
-        self.exit_shortcut.activated.connect(self.close)
 
     def _setup_window(self):
         """Configure window geometry and appearance."""
@@ -74,41 +72,14 @@ class MainWindow(QMainWindow):
         """)
 
     def _setup_ui(self):
-        """Build the main layout: status bar + stacked screens."""
+        """Build the main layout: just the stacked screens, edge to edge."""
         central = QWidget(self)
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(5)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        # ═══════ TOP BAR: Status + Settings gear ═══════
-        top_bar = QHBoxLayout()
-
-        self.status_label = QLabel("🤖 AGV Ready", self)
-        self.status_label.setStyleSheet("color: #888; font-size: 14px;")
-        top_bar.addWidget(self.status_label)
-        top_bar.addStretch()
-
-        # Small gear icon to enter settings
-        self.settings_btn = QPushButton("⚙️", self)
-        self.settings_btn.setFixedSize(40, 40)
-        self.settings_btn.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                color: #666;
-                font-size: 20px;
-                border: none;
-            }
-            QPushButton:pressed {
-                color: #fff;
-            }
-        """)
-        self.settings_btn.clicked.connect(self._on_settings_clicked)
-        top_bar.addWidget(self.settings_btn)
-
-        main_layout.addLayout(top_bar)
-
-        # ═══════ STACKED WIDGET: All screens ═══════
+        # ═══════ STACKED WIDGET: All screens (fills entire window) ═══════
         self.stack = QStackedWidget(self)
 
         # Create each screen
@@ -144,80 +115,6 @@ class MainWindow(QMainWindow):
 
         main_layout.addWidget(self.stack)
 
-        # ═══════ PIN OVERLAY (hidden by default) ═══════
-        self._setup_pin_overlay()
-
-    def _setup_pin_overlay(self):
-        """Modal PIN keypad overlay for settings access."""
-        from PyQt5.QtWidgets import QGridLayout, QLineEdit
-
-        self.pin_overlay = QWidget(self.centralWidget())
-        self.pin_overlay.setGeometry(200, 100, 400, 400)
-        self.pin_overlay.setStyleSheet("""
-            QWidget {
-                background-color: #1a1a1a;
-                border: 2px solid #444;
-                border-radius: 15px;
-            }
-        """)
-        self.pin_overlay.hide()
-
-        overlay_layout = QVBoxLayout(self.pin_overlay)
-        overlay_layout.setAlignment(Qt.AlignCenter)
-
-        pin_title = QLabel("Enter PIN", self.pin_overlay)
-        pin_title.setAlignment(Qt.AlignCenter)
-        pin_title.setStyleSheet("font-size: 20px; color: #fff;")
-        overlay_layout.addWidget(pin_title)
-
-        self.pin_display = QLineEdit(self.pin_overlay)
-        self.pin_display.setAlignment(Qt.AlignCenter)
-        self.pin_display.setEchoMode(QLineEdit.Password)
-        self.pin_display.setReadOnly(True)
-        self.pin_display.setStyleSheet("""
-            QLineEdit {
-                font-size: 24px;
-                color: #fff;
-                background: #333;
-                border-radius: 8px;
-                padding: 10px;
-            }
-        """)
-        overlay_layout.addWidget(self.pin_display)
-
-        # PIN keypad grid
-        keypad = QGridLayout()
-        keypad.setSpacing(8)
-        digits = [
-            '1', '2', '3',
-            '4', '5', '6',
-            '7', '8', '9',
-            'C', '0', '✓'
-        ]
-        for i, digit in enumerate(digits):
-            btn = QPushButton(digit, self.pin_overlay)
-            btn.setFixedSize(80, 60)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #333;
-                    color: white;
-                    font-size: 20px;
-                    border-radius: 8px;
-                }
-                QPushButton:pressed {
-                    background-color: #555;
-                }
-            """)
-            if digit == 'C':
-                btn.clicked.connect(self._pin_clear)
-            elif digit == '✓':
-                btn.clicked.connect(self._pin_verify)
-            else:
-                btn.clicked.connect(lambda checked, d=digit: self._pin_digit(d))
-            keypad.addWidget(btn, i // 3, i % 3)
-
-        overlay_layout.addLayout(keypad)
-
     def _setup_reminder_timer(self):
         """45s timer for arrival reminder (worried face + banner)."""
         self._reminder_timer = QTimer(self)
@@ -245,6 +142,9 @@ class MainWindow(QMainWindow):
         )
         self.assignment_screen.assignment_cancelled.connect(
             self.controller.to_idle
+        )
+        self.assignment_screen.request_settings.connect(
+            self.controller.to_settings
         )
         self.arrived_screen.confirmed.connect(
             self.controller.confirm_pickup
@@ -282,8 +182,8 @@ class MainWindow(QMainWindow):
         if new_screen and hasattr(new_screen, 'on_enter'):
             new_screen.on_enter()
 
-        # Update status bar
-        self.status_label.setText(f"State: {new_state}")
+        # Debug: log to console instead of screen
+        print(f"[DEBUG] State changed to: {new_state}")
 
         # Handle arrival reminder timer
         if new_state == "arrived":
@@ -313,33 +213,3 @@ class MainWindow(QMainWindow):
         if self.controller.state == "arrived":
             self.arrived_screen.show_reminder()
             self.controller.set_mood("worried")
-
-    def _on_settings_clicked(self):
-        """Gear icon tapped — show PIN overlay."""
-        self._pin_clear()
-        self.pin_overlay.show()
-        self.pin_overlay.raise_()
-
-    def _pin_digit(self, digit):
-        """PIN keypad digit pressed."""
-        current = self.pin_display.text()
-        if len(current) < 6:
-            self.pin_display.setText(current + digit)
-
-    def _pin_clear(self):
-        """Clear PIN entry."""
-        self.pin_display.clear()
-
-    def _pin_verify(self):
-        """Check PIN and enter settings if correct."""
-        if self.pin_display.text() == ADMIN_PIN:
-            self.pin_overlay.hide()
-            self._pin_clear()
-            self.controller.to_settings()
-        else:
-            self.pin_display.setText("WRONG")
-            QTimer.singleShot(800, self._pin_clear)
-
-
-# Need QLabel import
-from PyQt5.QtWidgets import QLabel

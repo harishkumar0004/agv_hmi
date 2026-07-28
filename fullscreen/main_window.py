@@ -7,6 +7,8 @@ screen logic belongs inside each screen's own file, never here.
 Screens are placeholders in this first part. They get replaced with
 real screens (idle_screen.py, assignment_screen.py, ...) in parts 3-6.
 """
+from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QLabel, QVBoxLayout
 
@@ -27,6 +29,8 @@ class PlaceholderScreen(QWidget):
         label = QLabel(label_text)
         label.setStyleSheet("font-size: 28px;")
         layout.addWidget(label)
+        # Development shortcut
+
 
     def on_enter(self):
         pass
@@ -55,6 +59,8 @@ class MainWindow(QMainWindow):
 
         self.controller.state_changed.connect(self._on_state_changed)
         self._on_state_changed(self.controller.state)
+        self.exit_shortcut = QShortcut(QKeySequence("Esc"), self)
+        self.exit_shortcut.activated.connect(self.close)
 
     def keyPressEvent(self, event):
         if DEV_MODE and event.key() == Qt.Key_Escape:

@@ -1,8 +1,16 @@
 """
 settings_screen.py — Admin configuration screen.
 
-Reached via gear icon → PIN keypad overlay → this screen.
-Contains placeholder panels for future config options.
+Reached from AssignmentScreen via gear icon → PIN.
+Contains ONLY:
+  - Volume slider
+  - Brightness slider
+  - Rack / Table count config
+  - Shutdown button
+  - Return-to-desktop button
+  - Back button
+
+No Wi-Fi config panel (stub), no diagnostics, no restart app.
 """
 
 from PyQt5.QtCore import Qt, pyqtSignal
@@ -17,15 +25,12 @@ class SettingsScreen(QWidget):
     ┌─────────────────────────────────────────┐
     │  ⚙️ Settings                [Back]      │
     │                                         │
-    │  Wi-Fi: [Not connected]    [Configure]  │
-    │  Brightness: [━━━━●━━━━]                │
     │  Volume:     [━━━━━●━━━]                │
+    │  Brightness: [━━━━●━━━━]                │
     │                                         │
     │  Racks: 3    Tables: 20    [Change]     │
     │                                         │
-    │  [Diagnostics]  [Restart App]           │
-    │  [Restart Pi]   [Shutdown]              │
-    │  [Exit to Desktop]                      │
+    │  [Shutdown]  [Return to Desktop]        │
     └─────────────────────────────────────────┘
     """
 
@@ -37,8 +42,9 @@ class SettingsScreen(QWidget):
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(20)
         layout.setAlignment(Qt.AlignTop)
-        layout.setSpacing(15)
 
         # --- Header ---
         header = QHBoxLayout()
@@ -61,34 +67,11 @@ class SettingsScreen(QWidget):
         header.addWidget(back_btn)
         layout.addLayout(header)
 
-        # --- Wi-Fi ---
-        wifi_row = QHBoxLayout()
-        wifi_label = QLabel("Wi-Fi:", self)
-        wifi_label.setStyleSheet("color: #ccc; font-size: 16px;")
-        wifi_row.addWidget(wifi_label)
-
-        self.wifi_status = QLabel("Not connected", self)
-        self.wifi_status.setStyleSheet("color: #e74c3c; font-size: 16px;")
-        wifi_row.addWidget(self.wifi_status)
-        wifi_row.addStretch()
-
-        wifi_btn = QPushButton("Configure", self)
-        wifi_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #3498db;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 6px;
-            }
-        """)
-        wifi_row.addWidget(wifi_btn)
-        layout.addLayout(wifi_row)
+        # --- Volume ---
+        layout.addWidget(self._make_slider_row("Volume:", 70))
 
         # --- Brightness ---
         layout.addWidget(self._make_slider_row("Brightness:", 50))
-
-        # --- Volume ---
-        layout.addWidget(self._make_slider_row("Volume:", 70))
 
         # --- Rack/Table count ---
         counts_row = QHBoxLayout()
@@ -107,31 +90,24 @@ class SettingsScreen(QWidget):
         layout.addLayout(counts_row)
 
         # --- Action buttons ---
-        actions_grid = QHBoxLayout()
-        for label, color in [
-            ("Diagnostics", "#9b59b6"),
-            ("Restart App", "#f39c12"),
-            ("Restart Pi", "#e67e22"),
-            ("Shutdown", "#e74c3c"),
-        ]:
-            btn = QPushButton(label, self)
-            btn.setFixedHeight(50)
-            btn.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {color};
-                    color: white;
-                    font-size: 14px;
-                    font-weight: bold;
-                    border-radius: 8px;
-                }}
-            """)
-            actions_grid.addWidget(btn)
-        layout.addLayout(actions_grid)
+        actions_row = QHBoxLayout()
 
-        # --- Exit to desktop ---
-        exit_btn = QPushButton("🖥️ Exit to Desktop", self)
-        exit_btn.setFixedHeight(50)
-        exit_btn.setStyleSheet("""
+        shutdown_btn = QPushButton("⏻ Shutdown", self)
+        shutdown_btn.setFixedHeight(50)
+        shutdown_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #e74c3c;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 8px;
+            }
+        """)
+        actions_row.addWidget(shutdown_btn)
+
+        desktop_btn = QPushButton("🖥️ Return to Desktop", self)
+        desktop_btn.setFixedHeight(50)
+        desktop_btn.setStyleSheet("""
             QPushButton {
                 background-color: #34495e;
                 color: white;
@@ -139,8 +115,9 @@ class SettingsScreen(QWidget):
                 border-radius: 8px;
             }
         """)
-        layout.addWidget(exit_btn)
+        actions_row.addWidget(desktop_btn)
 
+        layout.addLayout(actions_row)
         layout.addStretch()
         self.setLayout(layout)
 
