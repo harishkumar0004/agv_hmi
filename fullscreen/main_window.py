@@ -7,9 +7,15 @@ screen logic belongs inside each screen's own file, never here.
 Screens are placeholders in this first part. They get replaced with
 real screens (idle_screen.py, assignment_screen.py, ...) in parts 3-6.
 """
-from PyQt5.QtWidgets import QMainWindow, QStackedWidget, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QLabel, QVBoxLayout
 
 from fullscreen.controller import Controller
+
+# DEV-ONLY: lets you exit the fullscreen kiosk with Esc while developing.
+# Remove this before real deployment -- see the system design doc's
+# note on disabling escape shortcuts on the public-facing kiosk.
+DEV_MODE = True
 
 
 class PlaceholderScreen(QWidget):
@@ -49,6 +55,12 @@ class MainWindow(QMainWindow):
 
         self.controller.state_changed.connect(self._on_state_changed)
         self._on_state_changed(self.controller.state)
+
+    def keyPressEvent(self, event):
+        if DEV_MODE and event.key() == Qt.Key_Escape:
+            QApplication.quit()
+            return
+        super().keyPressEvent(event)
 
     def _on_state_changed(self, new_state):
         self.stack.currentWidget().on_exit()
