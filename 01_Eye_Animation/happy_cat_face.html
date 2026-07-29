@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Happy Cat Face</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #0a0a00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #111;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #1a1a00,
+      0 0 0 14px #0d0d00,
+      0 0 55px rgba(255,220,0,0.3);
+    animation: happyWiggle 0.55s ease-in-out infinite;
+  }
+
+  @keyframes happyWiggle {
+    0%,100% { transform: rotate(0deg) scale(1); }
+    25%      { transform: rotate(-0.6deg) scale(1.005); }
+    75%      { transform: rotate(0.6deg)  scale(1.005); }
+  }
+
+  /* Ears — perky and upright, slight forward lean */
+  .ears {
+    position: absolute;
+    top: -68px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #111;
+    position: relative;
+    transform-origin: bottom center;
+    animation: earBounce 0.55s ease-in-out infinite;
+  }
+  .ear-left  { transform: rotate(-4deg);  animation-delay: 0s; }
+  .ear-right { transform: rotate(4deg);   animation-delay: 0.12s; }
+
+  @keyframes earBounce {
+    0%,100% { transform: rotate(-4deg) scaleY(1); }
+    50%      { transform: rotate(-4deg) scaleY(1.07) translateY(-4px); }
+  }
+  .ear-right {
+    animation-name: earBounceR;
+  }
+  @keyframes earBounceR {
+    0%,100% { transform: rotate(4deg) scaleY(1); }
+    50%      { transform: rotate(4deg) scaleY(1.07) translateY(-4px); }
+  }
+
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #1a1400;
+  }
+
+  /* Screen */
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Warm shimmer overlay */
+  .shimmer {
+    position: absolute;
+    inset: 0; border-radius: 42px;
+    background: radial-gradient(ellipse at 28% 28%, rgba(255,240,100,0.12) 0%, transparent 60%);
+    animation: shimmerPulse 1.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 40;
+  }
+  @keyframes shimmerPulse {
+    0%,100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+
+  /* Scanline */
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,120,0.015) 3px, rgba(255,255,120,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    animation: happyBounce 0.55s ease-in-out infinite;
+  }
+
+  @keyframes happyBounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-9px) scale(1.012); }
+  }
+
+  /* Floating hearts */
+  .heart {
+    position: absolute;
+    pointer-events: none;
+    z-index: 45;
+    animation: heartRise ease-in-out infinite;
+  }
+  @keyframes heartRise {
+    0%   { transform: translateY(30px) scale(0.4) rotate(-10deg); opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 0.7; }
+    100% { transform: translateY(-90px) scale(0.9) rotate(10deg); opacity: 0; }
+  }
+
+  /* Confetti bits */
+  .confetti {
+    position: absolute;
+    pointer-events: none;
+    z-index: 44;
+    border-radius: 2px;
+    animation: confettiFall linear infinite;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-15px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(380px) rotate(600deg); opacity: 0.2; }
+  }
+
+  /* Sparkle star pop */
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 46;
+    color: #ffe066;
+    font-size: 18px;
+    animation: sparklePop ease-in-out infinite;
+  }
+  @keyframes sparklePop {
+    0%,100% { transform: scale(0.4) rotate(0deg);   opacity: 0; }
+    40%,60% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel" id="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="shimmer"></div>
+
+    <!-- Floating hearts -->
+    <div class="heart" style="bottom:6%;left:12%;animation-duration:2.4s;animation-delay:0s;">
+      <svg width="24" height="22" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ff69b4"/></svg>
+    </div>
+    <div class="heart" style="bottom:4%;right:14%;animation-duration:3s;animation-delay:0.7s;">
+      <svg width="18" height="16" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ffb300"/></svg>
+    </div>
+    <div class="heart" style="bottom:10%;left:44%;animation-duration:2.8s;animation-delay:1.3s;">
+      <svg width="20" height="18" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ff69b4"/></svg>
+    </div>
+
+    <!-- Sparkle stars -->
+    <div class="sparkle" style="top:8%;left:6%;animation-duration:1.8s;animation-delay:0s;">★</div>
+    <div class="sparkle" style="top:6%;right:8%;animation-duration:2.2s;animation-delay:0.5s;">✦</div>
+    <div class="sparkle" style="top:38%;left:2%;animation-duration:2s;animation-delay:1s;font-size:14px;">✦</div>
+    <div class="sparkle" style="top:35%;right:3%;animation-duration:1.9s;animation-delay:0.3s;font-size:14px;">★</div>
+
+    <!-- Confetti -->
+    <div class="confetti" style="width:7px;height:7px;background:#ff69b4;top:-8px;left:10%;animation-duration:2.4s;animation-delay:0s;"></div>
+    <div class="confetti" style="width:5px;height:9px;background:#ffe066;top:-8px;left:30%;animation-duration:3s;animation-delay:0.4s;"></div>
+    <div class="confetti" style="width:8px;height:5px;background:#66d9ff;top:-8px;left:52%;animation-duration:2.6s;animation-delay:0.8s;"></div>
+    <div class="confetti" style="width:6px;height:7px;background:#aaffaa;top:-8px;left:70%;animation-duration:2.2s;animation-delay:1.1s;"></div>
+    <div class="confetti" style="width:7px;height:6px;background:#ff9966;top:-8px;left:88%;animation-duration:2.8s;animation-delay:0.3s;"></div>
+
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Background — warm black with golden hint -->
+      <rect width="584" height="355" fill="#050400" rx="42"/>
+
+      <!-- ═══════════════════════════════════════
+           HAPPY EYES — same centres (180,158) (404,158)
+           Squished to crescents: full white circle but
+           a large black rect covers the top ~60%,
+           leaving only the bottom arc visible = ^^ shape
+      ═══════════════════════════════════════ -->
+
+      <!-- LEFT EYE happy crescent -->
+      <g id="eyeGroupL">
+        <!-- Full sclera -->
+        <circle cx="180" cy="158" r="118" fill="white"/>
+        <!-- Black mask covering top 60% — leaves bottom crescent -->
+        <rect x="62" y="40" width="236" height="145" fill="#050400"/>
+        <!-- Pupil sits in lower crescent -->
+        <g id="pupilGroupL">
+          <circle cx="180" cy="230" r="48" fill="#0a0800"/>
+          <circle cx="202" cy="208" r="14" fill="white" opacity="0.9"/>
+          <circle cx="163" cy="248" r="8"  fill="white" opacity="0.55"/>
+        </g>
+        <!-- Eye shine — sparkle in crescent -->
+        <circle cx="210" cy="205" r="9" fill="white" opacity="0.95"/>
+        <!-- Blink lid -->
+        <clipPath id="eyeClipL">
+          <rect x="62" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidL" x="62" y="40" width="236" height="0" fill="#050400"
+              clip-path="url(#eyeClipL)"/>
+      </g>
+
+      <!-- RIGHT EYE happy crescent -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="158" r="118" fill="white"/>
+        <rect x="286" y="40" width="236" height="145" fill="#050400"/>
+        <g id="pupilGroupR">
+          <circle cx="404" cy="230" r="48" fill="#0a0800"/>
+          <circle cx="426" cy="208" r="14" fill="white" opacity="0.9"/>
+          <circle cx="387" cy="248" r="8"  fill="white" opacity="0.55"/>
+        </g>
+        <circle cx="434" cy="205" r="9" fill="white" opacity="0.95"/>
+        <clipPath id="eyeClipR">
+          <rect x="286" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidR" x="286" y="40" width="236" height="0" fill="#050400"
+              clip-path="url(#eyeClipR)"/>
+      </g>
+
+      <!-- ═══ HAPPY EYEBROWS — raised high, gentle outward curve ═══ -->
+      <!-- Left brow: swoops upward, inner end raised -->
+      <path d="M 112 28 Q 180 10 244 30"
+            stroke="white" stroke-width="8"
+            stroke-linecap="round" fill="none" opacity="0.97"/>
+      <!-- Right brow -->
+      <path d="M 340 30 Q 404 10 472 28"
+            stroke="white" stroke-width="8"
+            stroke-linecap="round" fill="none" opacity="0.97"/>
+
+      <!-- ═══ NOSE — same inverted triangle ═══ -->
+      <polygon points="292,308  278,290  306,290"
+               fill="#ffe8a0" opacity="0.92"/>
+
+      <!-- ═══ MOUTH — wide open happy with tongue ═══ -->
+      <!-- Big smile arc -->
+      <path d="M 238 320 Q 292 355 346 320"
+            stroke="#ffe8a0" stroke-width="5.5"
+            stroke-linecap="round" fill="none" opacity="0.95"/>
+      <!-- Teeth (white fill inside smile) -->
+      <path d="M 245 323 Q 292 352 339 323 L 335 330 Q 292 356 249 330 Z"
+            fill="white" opacity="0.9"/>
+      <!-- Teeth dividers -->
+      <line x1="268" y1="324" x2="266" y2="334" stroke="#ddd" stroke-width="1.5" opacity="0.8"/>
+      <line x1="292" y1="324" x2="292" y2="336" stroke="#ddd" stroke-width="1.5" opacity="0.8"/>
+      <line x1="316" y1="324" x2="318" y2="334" stroke="#ddd" stroke-width="1.5" opacity="0.8"/>
+      <!-- Tongue -->
+      <ellipse cx="292" cy="346" rx="20" ry="13" fill="#ff8fa3" opacity="0.95"/>
+      <line x1="292" y1="334" x2="292" y2="356" stroke="#ff6b8a" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+
+      <!-- ═══ ROSY CHEEKS ═══ -->
+      <!-- Left cheek blush — below left eye outer-bottom -->
+      <ellipse cx="82"  cy="272" rx="46" ry="24" fill="#ff9988" opacity="0.38"/>
+      <!-- Right cheek blush -->
+      <ellipse cx="502" cy="272" rx="46" ry="24" fill="#ff9988" opacity="0.38"/>
+
+      <!-- ═══ WHISKERS — same origins, fanned and slightly up-tilted in joy ═══ -->
+      <!-- LEFT: origin (80,265) -->
+      <line x1="80" y1="255" x2="-18" y2="228" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="80" y1="266" x2="-20" y2="264" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="80" y1="277" x2="-18" y2="296" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- RIGHT: origin (504,265) -->
+      <line x1="504" y1="255" x2="602" y2="228" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="504" y1="266" x2="604" y2="264" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="504" y1="277" x2="602" y2="296" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- ═══ SPARKLE DOTS IN BACKGROUND ═══ -->
+      <circle id="sp1" cx="52"  cy="60"  r="5" fill="#ffe066" opacity="0"/>
+      <circle id="sp2" cx="532" cy="55"  r="4" fill="#ff69b4" opacity="0"/>
+      <circle id="sp3" cx="44"  cy="300" r="4" fill="#66ffcc" opacity="0"/>
+      <circle id="sp4" cx="540" cy="295" r="5" fill="#ffe066" opacity="0"/>
+      <circle id="sp5" cx="292" cy="22"  r="4" fill="#ff69b4" opacity="0"/>
+
+    </svg>
+  </div>
+</div>
+
+<script>
+const screen  = document.getElementById('screen');
+const faceSvg = document.getElementById('faceSvg');
+const pupilL  = document.getElementById('pupilGroupL');
+const pupilR  = document.getElementById('pupilGroupR');
+const lidL    = document.getElementById('lidL');
+const lidR    = document.getElementById('lidR');
+const bezel   = document.getElementById('bezel');
+
+/* Pupil tracking (limited range — they're in the lower crescent) */
+document.addEventListener('mousemove', e => {
+  const r  = screen.getBoundingClientRect();
+  const cx = r.left + r.width  / 2;
+  const cy = r.top  + r.height / 2;
+  const dx = Math.max(-1, Math.min(1, (e.clientX - cx) / (r.width  / 2)));
+  const dy = Math.max(-1, Math.min(1, (e.clientY - cy) / (r.height / 2)));
+  const ox = dx * 8; const oy = dy * 5;
+  pupilL.setAttribute('transform', `translate(${ox},${oy})`);
+  pupilR.setAttribute('transform', `translate(${ox},${oy})`);
+});
+document.addEventListener('mouseleave', () => {
+  pupilL.setAttribute('transform','');
+  pupilR.setAttribute('transform','');
+});
+
+/* Happy blink — quick cheerful squint */
+let blinking = false;
+function doBlink() {
+  if (blinking) return;
+  blinking = true;
+  const steps = 8; const fullH = 236;
+  let frame = 0, dir = 1;
+  const tick = () => {
+    frame += dir;
+    const h = Math.round((frame / steps) * fullH);
+    lidL.setAttribute('height', h);
+    lidR.setAttribute('height', h);
+    if (dir === 1 && frame >= steps) dir = -1;
+    if (dir === -1 && frame <= 0) {
+      lidL.setAttribute('height', 0);
+      lidR.setAttribute('height', 0);
+      blinking = false;
+      setTimeout(doBlink, 2200 + Math.random() * 2500);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(doBlink, 1800);
+
+/* Bouncy float */
+let floatT = 0;
+(function floatLoop() {
+  floatT += 0.028;
+  const dy = Math.sin(floatT) * 8;
+  faceSvg.style.transform = `translateY(${dy}px)`;
+  requestAnimationFrame(floatLoop);
+})();
+
+/* Sparkle dot pop in SVG */
+const spDots = ['sp1','sp2','sp3','sp4','sp5'].map(id => document.getElementById(id));
+let spIdx = 0;
+function popSparkle() {
+  const s = spDots[spIdx % spDots.length];
+  spIdx++;
+  s.setAttribute('opacity','1');
+  let scale = 1;
+  const grow = () => {
+    scale += 0.12;
+    s.setAttribute('r', String(parseFloat(s.getAttribute('r') || 4) * 1.0));
+    if (scale < 1.6) requestAnimationFrame(grow);
+    else setTimeout(() => s.setAttribute('opacity','0'), 300);
+  };
+  grow();
+  setTimeout(popSparkle, 550 + Math.random() * 400);
+}
+setTimeout(popSparkle, 800);
+
+/* Dynamic JS sparkle burst on click */
+screen.addEventListener('click', () => {
+  const colors = ['#ffe066','#ff69b4','#66ffcc','#ffb300','#aaaaff'];
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    const angle = (i / 8) * 360;
+    const dist  = 60 + Math.random() * 40;
+    d.style.cssText = `
+      position:absolute;width:6px;height:6px;
+      background:${colors[i%colors.length]};
+      border-radius:50%;
+      left:50%;top:50%;
+      pointer-events:none;z-index:60;
+      transition:transform 0.5s ease,opacity 0.5s ease;
+      transform:translate(-50%,-50%);
+    `;
+    screen.appendChild(d);
+    requestAnimationFrame(() => {
+      const rad = angle * Math.PI / 180;
+      d.style.transform = `translate(calc(-50% + ${Math.cos(rad)*dist}px), calc(-50% + ${Math.sin(rad)*dist}px))`;
+      d.style.opacity = '0';
+    });
+    setTimeout(() => d.remove(), 600);
+  }
+});
+
+/* Glow pulse */
+let gt = 0;
+setInterval(() => {
+  gt += 0.1;
+  const g = 48 + Math.sin(gt) * 18;
+  const a = 0.25 + Math.sin(gt) * 0.1;
+  bezel.style.boxShadow = `0 0 0 8px #1a1a00, 0 0 0 14px #0d0d00, 0 0 ${g}px rgba(255,220,0,${a})`;
+}, 80);
+
+/* Ear bounce on click */
+const ears = document.querySelectorAll('.ear');
+screen.addEventListener('click', () => {
+  ears.forEach(ear => {
+    const isLeft = ear.classList.contains('ear-left');
+    ear.style.transition = 'transform 0.1s ease';
+    ear.style.transform = isLeft ? 'rotate(-10deg) scaleY(1.25)' : 'rotate(10deg) scaleY(1.25)';
+    setTimeout(() => {
+      ear.style.transform = isLeft ? 'rotate(-4deg)' : 'rotate(4deg)';
+      setTimeout(() => { ear.style.transform = ''; }, 200);
+    }, 120);
+  });
+});
+</script>
+</body>
+</html>

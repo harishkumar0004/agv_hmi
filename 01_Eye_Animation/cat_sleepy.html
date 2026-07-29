@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Sleepy Cat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #060810;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* soft blue moonlight ambient */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(80,120,220,0.1) 0%, transparent 70%);
+    pointer-events: none;
+    animation: ambientBreath 4s ease-in-out infinite alternate;
+  }
+  @keyframes ambientBreath {
+    from { opacity: 0.5; transform: scale(0.95); }
+    to   { opacity: 1;   transform: scale(1.05); }
+  }
+
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #0e0e14;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #131318,
+      0 0 0 14px #0a0a10,
+      0 0 60px rgba(60,80,180,0.15),
+      0 0 120px rgba(60,80,180,0.06);
+    /* slow lazy sway */
+    animation: lazySway 5s ease-in-out infinite alternate;
+  }
+  @keyframes lazySway {
+    from { transform: rotate(-0.8deg) translateY(0px); }
+    to   { transform: rotate(0.8deg)  translateY(3px); }
+  }
+
+  /* Droopy ears */
+  .ears {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #0e0e14;
+    position: relative;
+    transform-origin: bottom center;
+    /* ears drooping */
+    animation: earDroop 5s ease-in-out infinite alternate;
+  }
+  .ear-left  { transform: rotate(-10deg); animation-delay: 0s; }
+  .ear-right { transform: rotate(10deg);  animation-delay: 0.8s; }
+
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #0d0612;
+  }
+  @keyframes earDroop {
+    from { transform: rotate(-14deg); }
+    to   { transform: rotate(-6deg); }
+  }
+  .ear-right { animation-name: earDroopR; }
+  @keyframes earDroopR {
+    from { transform: rotate(14deg); }
+    to   { transform: rotate(6deg); }
+  }
+
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000005;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* cool blue screen tint */
+  .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 35%, rgba(50,70,180,0.08) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 40;
+    border-radius: 42px;
+  }
+
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,255,0.010) 3px, rgba(255,255,255,0.010) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* floating Z's */
+  .zzz {
+    position: absolute;
+    color: rgba(150,180,255,0.55);
+    font-family: Georgia, serif;
+    font-style: italic;
+    pointer-events: none;
+    z-index: 46;
+    animation: floatZ 3.5s ease-out infinite;
+    opacity: 0;
+  }
+  .zzz:nth-child(1) { font-size:18px; right:18%; bottom:28%; animation-delay: 0s; }
+  .zzz:nth-child(2) { font-size:26px; right:10%; bottom:42%; animation-delay: 1.2s; }
+  .zzz:nth-child(3) { font-size:34px; right:4%;  bottom:56%; animation-delay: 2.4s; }
+
+  @keyframes floatZ {
+    0%   { opacity: 0; transform: translate(0, 0) rotate(-5deg); }
+    20%  { opacity: 0.8; }
+    80%  { opacity: 0.4; }
+    100% { opacity: 0; transform: translate(-18px, -50px) rotate(8deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <!-- Z's -->
+    <div class="zzz">z</div>
+    <div class="zzz">z</div>
+    <div class="zzz">z</div>
+
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="35%" r="55%">
+          <stop offset="0%" stop-color="#060814"/>
+          <stop offset="100%" stop-color="#000005"/>
+        </radialGradient>
+        <!-- clip paths for half-lids -->
+        <clipPath id="eyeClipL">
+          <rect x="62" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <clipPath id="eyeClipR">
+          <rect x="286" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+      </defs>
+      <rect width="584" height="355" fill="url(#bgGrad)" rx="42"/>
+
+      <!-- ══ LEFT EYE — half lidded ══ -->
+      <g id="eyeGroupL">
+        <circle cx="180" cy="158" r="118" fill="white" opacity="0.9"/>
+        <!-- sleepy iris — muted lavender -->
+        <circle cx="180" cy="158" r="76" fill="#6a6aaa"/>
+        <g id="pupilGroupL">
+          <!-- smaller pupil (relaxed) -->
+          <circle cx="180" cy="166" r="48" fill="#05050a"/>
+          <circle cx="200" cy="148" r="14" fill="white" opacity="0.7"/>
+          <circle cx="163" cy="185" r="8"  fill="white" opacity="0.4"/>
+        </g>
+        <!-- HEAVY upper lid — covers ~62% of eye -->
+        <rect id="lidTopL" x="62" y="40" width="236" height="146"
+              fill="#000005" clip-path="url(#eyeClipL)"
+              rx="0"/>
+        <!-- lid border / lash line -->
+        <path d="M 62 186 Q 180 178 298 186"
+              stroke="#000005" stroke-width="6" fill="none"/>
+        <!-- Lower lid puff (sleepy bags) -->
+        <path d="M 76 230 Q 180 248 284 230"
+              stroke="rgba(180,180,255,0.18)" stroke-width="5" fill="none"/>
+      </g>
+
+      <!-- ══ RIGHT EYE ══ -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="158" r="118" fill="white" opacity="0.9"/>
+        <circle cx="404" cy="158" r="76" fill="#6a6aaa"/>
+        <g id="pupilGroupR">
+          <circle cx="404" cy="166" r="48" fill="#05050a"/>
+          <circle cx="424" cy="148" r="14" fill="white" opacity="0.7"/>
+          <circle cx="387" cy="185" r="8"  fill="white" opacity="0.4"/>
+        </g>
+        <rect id="lidTopR" x="286" y="40" width="236" height="146"
+              fill="#000005" clip-path="url(#eyeClipR)"/>
+        <path d="M 286 186 Q 404 178 522 186"
+              stroke="#000005" stroke-width="6" fill="none"/>
+        <path d="M 300 230 Q 404 248 508 230"
+              stroke="rgba(180,180,255,0.18)" stroke-width="5" fill="none"/>
+      </g>
+
+      <!-- ══ EYEBROWS — heavy, low, droopy ══ -->
+      <path id="browL"
+            d="M 118 50 Q 180 46 240 52"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.7"/>
+      <path id="browR"
+            d="M 344 52 Q 404 46 466 50"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.7"/>
+
+      <!-- ══ NOSE ══ -->
+      <polygon points="292,308  278,292  306,292"
+               fill="white" opacity="0.7"/>
+
+      <!-- ══ MOUTH — small content curve, barely awake ══ -->
+      <path d="M 270 318 Q 292 328 314 318"
+            stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.7"/>
+
+      <!-- ══ WHISKERS — drooped slightly ══ -->
+      <line x1="80"  y1="260" x2="-18" y2="244" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+      <line x1="80"  y1="270" x2="-18" y2="272" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+      <line x1="80"  y1="280" x2="-18" y2="300" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+
+      <line x1="504" y1="260" x2="602" y2="244" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+      <line x1="504" y1="270" x2="602" y2="272" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+      <line x1="504" y1="280" x2="602" y2="300" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+
+      <!-- soft under-eye shadows -->
+      <ellipse cx="180" cy="278" rx="60" ry="12" fill="rgba(0,0,20,0.4)"/>
+      <ellipse cx="404" cy="278" rx="60" ry="12" fill="rgba(0,0,20,0.4)"/>
+
+    </svg>
+  </div>
+</div>
+
+<script>
+const screen  = document.getElementById('screen');
+const pupilL  = document.getElementById('pupilGroupL');
+const pupilR  = document.getElementById('pupilGroupR');
+const faceSvg = document.getElementById('faceSvg');
+const lidTopL = document.getElementById('lidTopL');
+const lidTopR = document.getElementById('lidTopR');
+
+/* Lazy pupil tracking */
+let targetOx = 0, targetOy = 0, curOx = 0, curOy = 0;
+document.addEventListener('mousemove', e => {
+  const r  = screen.getBoundingClientRect();
+  const dx = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width/2) / (r.width/2)));
+  const dy = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height/2) / (r.height/2)));
+  targetOx = dx * 8;
+  targetOy = dy * 6;
+});
+
+/* Lazy float — very slow */
+let ft = 0;
+(function floatLoop() {
+  ft += 0.008;
+  curOx += (targetOx - curOx) * 0.03; /* sluggish follow */
+  curOy += (targetOy - curOy) * 0.03;
+  pupilL.setAttribute('transform', `translate(${curOx},${curOy})`);
+  pupilR.setAttribute('transform', `translate(${curOx},${curOy})`);
+
+  const dy = Math.sin(ft) * 5;
+  const dr = Math.sin(ft * 0.7) * 0.6;
+  faceSvg.style.transform = `translateY(${dy}px) rotate(${dr}deg)`;
+  requestAnimationFrame(floatLoop);
+})();
+
+/* Slow drowsy blink — eyes close fully then open slowly */
+let sleeping = false;
+function drowsyBlink() {
+  if (sleeping) return;
+  const steps = 18;
+  const baseH = 146; /* normal half-lid height */
+  const fullH = 236;
+  let frame = 0, dir = 1;
+
+  const tick = () => {
+    frame += dir;
+    const h = baseH + Math.round(((frame / steps)) * (fullH - baseH));
+    lidTopL.setAttribute('height', Math.min(h, fullH));
+    lidTopR.setAttribute('height', Math.min(h, fullH));
+
+    if (dir === 1 && frame >= steps) {
+      /* hold closed briefly */
+      setTimeout(() => { dir = -1; requestAnimationFrame(tick); }, 400);
+      return;
+    }
+    if (dir === -1 && frame <= 0) {
+      lidTopL.setAttribute('height', baseH);
+      lidTopR.setAttribute('height', baseH);
+      setTimeout(drowsyBlink, 3500 + Math.random() * 2500);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(drowsyBlink, 2000);
+</script>
+</body>
+</html>

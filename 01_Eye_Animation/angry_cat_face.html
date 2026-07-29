@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Angry Cat Face</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #0a0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #111;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #1a0000,
+      0 0 0 14px #0d0000,
+      0 0 60px rgba(200,0,0,0.35);
+    animation: bodyShake 0.18s infinite;
+  }
+
+  @keyframes bodyShake {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    20%  { transform: translate(-2px, 1px) rotate(-0.4deg); }
+    40%  { transform: translate(2px, -1px) rotate(0.4deg); }
+    60%  { transform: translate(-1px, 0px) rotate(-0.2deg); }
+    80%  { transform: translate(1px, 1px) rotate(0.2deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+  }
+
+  /* Cat ears — flattened back in anger */
+  .ears {
+    position: absolute;
+    top: -52px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #111;
+    position: relative;
+    transform-origin: bottom center;
+  }
+
+  /* Ears pinned flat and rotated outward */
+  .ear-left  { transform: rotate(-22deg) scaleY(0.7); }
+  .ear-right { transform: rotate(22deg)  scaleY(0.7); }
+
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #2a0000;
+  }
+
+  /* Screen */
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Red anger pulse overlay */
+  .anger-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 42px;
+    background: radial-gradient(ellipse at center, transparent 35%, rgba(160,0,0,0.28) 100%);
+    animation: angryGlow 0.7s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  @keyframes angryGlow {
+    0%,100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+
+  /* Scanline */
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,80,80,0.018) 3px, rgba(255,80,80,0.018) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    animation: angryBob 0.45s ease-in-out infinite;
+  }
+
+  @keyframes angryBob {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+
+  /* Steam puffs above head */
+  .steam-wrap {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 28px;
+    z-index: 45;
+    pointer-events: none;
+  }
+
+  .steam {
+    width: 12px; height: 12px;
+    background: rgba(255,200,180,0.75);
+    border-radius: 50%;
+    animation: steamUp 1.1s ease-out infinite;
+  }
+  .steam:nth-child(2) { animation-delay: 0.25s; width:9px; height:9px; }
+  .steam:nth-child(3) { animation-delay: 0.55s; }
+
+  @keyframes steamUp {
+    0%   { transform: translateY(0) scale(1);   opacity: 0.8; }
+    60%  { transform: translateY(-22px) scale(1.5); opacity: 0.5; }
+    100% { transform: translateY(-44px) scale(0.4); opacity: 0; }
+  }
+
+  /* Spark particles */
+  .spark {
+    position: absolute;
+    width: 5px; height: 5px;
+    background: #ff4400;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 44;
+    animation: sparkOut linear infinite;
+  }
+
+  @keyframes sparkOut {
+    0%   { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel" id="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="anger-pulse"></div>
+
+    <!-- Steam -->
+    <div class="steam-wrap">
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+    </div>
+
+    <!-- Sparks -->
+    <div class="spark" style="top:18%;left:9%;--tx:-34px;--ty:-28px;animation-duration:0.85s;animation-delay:0s;"></div>
+    <div class="spark" style="top:15%;right:11%;--tx:30px;--ty:-32px;animation-duration:0.7s;animation-delay:0.2s;"></div>
+    <div class="spark" style="bottom:22%;left:7%;--tx:-28px;--ty:22px;animation-duration:0.95s;animation-delay:0.4s;"></div>
+    <div class="spark" style="bottom:20%;right:9%;--tx:32px;--ty:20px;animation-duration:0.78s;animation-delay:0.15s;"></div>
+    <div class="spark" style="top:30%;left:5%;--tx:-22px;--ty:-18px;animation-duration:0.9s;animation-delay:0.6s;"></div>
+    <div class="spark" style="top:28%;right:6%;--tx:25px;--ty:-20px;animation-duration:0.82s;animation-delay:0.35s;"></div>
+
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Background — deep red-black -->
+      <rect width="584" height="355" fill="#080000" rx="42"/>
+
+      <!-- ═══ LEFT EYE — squinted, cut by angry lid from top-inner ═══
+           Same centre 180,158 r=118 as neutral face
+           Angry squint: black lid wedge covers top-inner portion (V-shape anger)
+      -->
+      <g id="eyeGroupL">
+        <!-- Sclera — slightly red-tinted white -->
+        <circle cx="180" cy="158" r="118" fill="#fff5f5"/>
+
+        <!-- Pupil -->
+        <g id="pupilGroupL">
+          <circle cx="180" cy="158" r="64" fill="#0a0000"/>
+          <circle cx="207" cy="128" r="16" fill="white" opacity="0.8"/>
+          <circle cx="156" cy="190" r="8"  fill="white" opacity="0.5"/>
+        </g>
+
+        <!-- Angry squint lid: black polygon from top, angled (inner corner low, outer corner high)
+             Creates the "V-brow shadow" look — inner dips deeper -->
+        <polygon points="62,40 298,40 298,130 180,185 62,120"
+                 fill="#080000"/>
+        <!-- Blink lid (for animation, same clip as neutral) -->
+        <clipPath id="eyeClipL">
+          <rect x="62" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidL" x="62" y="40" width="236" height="0" fill="#080000"
+              clip-path="url(#eyeClipL)"/>
+      </g>
+
+      <!-- ═══ RIGHT EYE ═══ -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="158" r="118" fill="#fff5f5"/>
+        <g id="pupilGroupR">
+          <circle cx="404" cy="158" r="64" fill="#0a0000"/>
+          <circle cx="431" cy="128" r="16" fill="white" opacity="0.8"/>
+          <circle cx="380" cy="190" r="8"  fill="white" opacity="0.5"/>
+        </g>
+        <!-- Mirror of left — inner corner (left side) dips low -->
+        <polygon points="286,40 522,40 522,120 404,185 286,130"
+                 fill="#080000"/>
+        <clipPath id="eyeClipR">
+          <rect x="286" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidR" x="286" y="40" width="236" height="0" fill="#080000"
+              clip-path="url(#eyeClipR)"/>
+      </g>
+
+      <!-- ═══ ANGRY EYEBROWS — thick, steep V pointing inward-down ═══
+           Left brow: outer end high, inner end very low (slants steeply inward)
+           Right brow: mirror
+      -->
+      <!-- Left brow: from outer-top (110,18) down to inner-bottom (248,58) -->
+      <line x1="110" y1="16" x2="250" y2="62"
+            stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.97"/>
+
+      <!-- Right brow: from inner-bottom (334,62) up to outer-top (474,16) -->
+      <line x1="334" y1="62" x2="474" y2="16"
+            stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.97"/>
+
+      <!-- ═══ NOSE — same small inverted triangle ═══ -->
+      <polygon points="292,308  278,290  306,290"
+               fill="#ffcccc" opacity="0.9"/>
+
+      <!-- ═══ MOUTH — angry frown (inverted arc) + clenched ═══ -->
+      <!-- Main frown arc -->
+      <path d="M 248 340 Q 292 310 336 340"
+            stroke="#ffcccc" stroke-width="5.5"
+            stroke-linecap="round" fill="none" opacity="0.9"/>
+      <!-- Teeth grind lines inside frown -->
+      <line x1="263" y1="328" x2="263" y2="337" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="278" y1="323" x2="278" y2="333" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="292" y1="321" x2="292" y2="331" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="306" y1="323" x2="306" y2="333" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line x1="321" y1="328" x2="321" y2="337" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- ═══ WHISKERS — same origins, but angled upward in anger ═══
+           Left origin: (80, 265)  Right origin: (504, 265)
+      -->
+      <!-- LEFT — fan upward / forward aggressively -->
+      <line x1="80" y1="258" x2="-18" y2="222" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+      <line x1="80" y1="268" x2="-20" y2="258" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+      <line x1="80" y1="278" x2="-18" y2="295" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+
+      <!-- RIGHT -->
+      <line x1="504" y1="258" x2="602" y2="222" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+      <line x1="504" y1="268" x2="604" y2="258" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+      <line x1="504" y1="278" x2="602" y2="295" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+
+      <!-- ═══ ANGER VEIN marks — pop in/out at corners ═══ -->
+      <g id="veinTL" opacity="0">
+        <path d="M 54 54  L 64 44  L 74 52  L 84 36"
+              stroke="#ff3300" stroke-width="3.5" stroke-linecap="round"
+              stroke-linejoin="round" fill="none"/>
+      </g>
+      <g id="veinTR" opacity="0">
+        <path d="M 530 54  L 520 44  L 510 52  L 500 36"
+              stroke="#ff3300" stroke-width="3.5" stroke-linecap="round"
+              stroke-linejoin="round" fill="none"/>
+      </g>
+
+    </svg>
+  </div>
+</div>
+
+<script>
+const screen    = document.getElementById('screen');
+const faceSvg   = document.getElementById('faceSvg');
+const pupilL    = document.getElementById('pupilGroupL');
+const pupilR    = document.getElementById('pupilGroupR');
+const lidL      = document.getElementById('lidL');
+const lidR      = document.getElementById('lidR');
+const veinTL    = document.getElementById('veinTL');
+const veinTR    = document.getElementById('veinTR');
+const bezel     = document.getElementById('bezel');
+
+/* Pupil tracking */
+document.addEventListener('mousemove', e => {
+  const r  = screen.getBoundingClientRect();
+  const cx = r.left + r.width  / 2;
+  const cy = r.top  + r.height / 2;
+  const dx = Math.max(-1, Math.min(1, (e.clientX - cx) / (r.width  / 2)));
+  const dy = Math.max(-1, Math.min(1, (e.clientY - cy) / (r.height / 2)));
+  const ox = dx * 9;
+  const oy = dy * 9;
+  pupilL.setAttribute('transform', `translate(${ox},${oy})`);
+  pupilR.setAttribute('transform', `translate(${ox},${oy})`);
+});
+document.addEventListener('mouseleave', () => {
+  pupilL.setAttribute('transform','');
+  pupilR.setAttribute('transform','');
+});
+
+/* Angry blink — fast, hard snap */
+let blinking = false;
+function doBlink() {
+  if (blinking) return;
+  blinking = true;
+  const steps = 6; const fullH = 236;
+  let frame = 0, dir = 1;
+  const tick = () => {
+    frame += dir;
+    const h = Math.round((frame / steps) * fullH);
+    lidL.setAttribute('height', h);
+    lidR.setAttribute('height', h);
+    if (dir === 1 && frame >= steps) dir = -1;
+    if (dir === -1 && frame <= 0) {
+      lidL.setAttribute('height', 0);
+      lidR.setAttribute('height', 0);
+      blinking = false;
+      setTimeout(doBlink, 1800 + Math.random() * 2200);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(doBlink, 1500);
+
+/* Float — rapid angry tremble bob */
+let floatT = 0;
+(function floatLoop() {
+  floatT += 0.055;
+  const dy = Math.sin(floatT) * 3.5;
+  faceSvg.style.transform = `translateY(${dy}px)`;
+  requestAnimationFrame(floatLoop);
+})();
+
+/* Vein pop — alternate TL / TR every 2s */
+let veinState = 0;
+function popVein() {
+  const v = veinState % 2 === 0 ? veinTL : veinTR;
+  v.setAttribute('opacity','1');
+  setTimeout(() => v.setAttribute('opacity','0'), 500);
+  veinState++;
+  setTimeout(popVein, 1600 + Math.random() * 1200);
+}
+setTimeout(popVein, 1000);
+
+/* Glow pulse on bezel */
+let glowT = 0;
+setInterval(() => {
+  glowT += 0.12;
+  const g = 50 + Math.sin(glowT) * 22;
+  const a = 0.3 + Math.sin(glowT) * 0.12;
+  bezel.style.boxShadow = `0 0 0 8px #1a0000, 0 0 0 14px #0d0000, 0 0 ${g}px rgba(200,0,0,${a})`;
+}, 80);
+
+/* Click → hard ear snap */
+const ears = document.querySelectorAll('.ear');
+screen.addEventListener('click', () => {
+  ears.forEach(ear => {
+    ear.style.transition = 'transform 0.1s ease';
+    ear.style.transform = ear.classList.contains('ear-left')
+      ? 'rotate(-35deg) scaleY(0.55)'
+      : 'rotate(35deg)  scaleY(0.55)';
+    setTimeout(() => {
+      ear.style.transform = ear.classList.contains('ear-left')
+        ? 'rotate(-22deg) scaleY(0.7)'
+        : 'rotate(22deg)  scaleY(0.7)';
+    }, 180);
+  });
+});
+</script>
+</body>
+</html>

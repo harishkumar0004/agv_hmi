@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot Face Engine</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="robot-stage" id="robotStage" data-emotion="normal" data-mode="face" aria-label="Hotel delivery robot face">
+    <section class="bezel" id="bezel">
+      <div class="ears" aria-hidden="true">
+        <div class="ear ear-left"></div>
+        <div class="ear ear-right"></div>
+      </div>
+
+      <div class="screen" id="screen">
+        <div class="effect-layer effect-normal" aria-hidden="true"></div>
+
+        <div class="effect-layer effect-happy" aria-hidden="true">
+          <div class="shimmer"></div>
+          <div class="heart heart-a">
+            <svg width="24" height="22" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ff69b4"/></svg>
+          </div>
+          <div class="heart heart-b">
+            <svg width="18" height="16" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ffb300"/></svg>
+          </div>
+          <div class="heart heart-c">
+            <svg width="20" height="18" viewBox="0 0 24 22"><path d="M12 20S2 13 2 7a5 5 0 0110 0 5 5 0 0110 0c0 6-10 13-10 13z" fill="#ff69b4"/></svg>
+          </div>
+          <div class="sparkle sparkle-a">&#9733;</div>
+          <div class="sparkle sparkle-b">&#10022;</div>
+          <div class="sparkle sparkle-c">&#10022;</div>
+          <div class="sparkle sparkle-d">&#9733;</div>
+          <div class="confetti confetti-a"></div>
+          <div class="confetti confetti-b"></div>
+          <div class="confetti confetti-c"></div>
+          <div class="confetti confetti-d"></div>
+          <div class="confetti confetti-e"></div>
+        </div>
+
+        <div class="effect-layer effect-angry" aria-hidden="true">
+          <div class="anger-pulse"></div>
+          <div class="steam-wrap">
+            <div class="steam"></div>
+            <div class="steam"></div>
+            <div class="steam"></div>
+          </div>
+          <div class="spark spark-a"></div>
+          <div class="spark spark-b"></div>
+          <div class="spark spark-c"></div>
+          <div class="spark spark-d"></div>
+          <div class="spark spark-e"></div>
+          <div class="spark spark-f"></div>
+        </div>
+
+        <div class="effect-layer effect-sad" aria-hidden="true">
+          <div class="rain-layer">
+            <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+            <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+            <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+            <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+          </div>
+        </div>
+
+        <div class="effect-layer effect-excited" aria-hidden="true">
+          <div class="excited-sparkle excited-sparkle-a">&#10022;</div>
+          <div class="excited-sparkle excited-sparkle-b">&#9733;</div>
+          <div class="excited-sparkle excited-sparkle-c">&#10022;</div>
+          <div class="excited-sparkle excited-sparkle-d">&#9733;</div>
+          <div class="excited-sparkle excited-sparkle-e">&#10022;</div>
+          <div class="excited-sparkle excited-sparkle-f">&#9733;</div>
+        </div>
+
+        <div class="effect-layer effect-sleepy" aria-hidden="true">
+          <div class="zzz zzz-a">z</div>
+          <div class="zzz zzz-b">z</div>
+          <div class="zzz zzz-c">z</div>
+        </div>
+
+        <svg class="face-svg" id="faceSvg" viewBox="0 0 584 355" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="eyeClipL">
+              <rect x="62" y="40" width="236" height="236" rx="118"></rect>
+            </clipPath>
+            <clipPath id="eyeClipR">
+              <rect x="286" y="40" width="236" height="236" rx="118"></rect>
+            </clipPath>
+            <filter id="tearBlur">
+              <feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+            </filter>
+            <radialGradient id="sadBgGrad" cx="50%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#060810"></stop>
+              <stop offset="100%" stop-color="#000002"></stop>
+            </radialGradient>
+            <radialGradient id="sleepyBgGrad" cx="50%" cy="35%" r="55%">
+              <stop offset="0%" stop-color="#060814"></stop>
+              <stop offset="100%" stop-color="#000005"></stop>
+            </radialGradient>
+            <radialGradient id="excitedBgGrad" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#0d0800"></stop>
+              <stop offset="100%" stop-color="#000"></stop>
+            </radialGradient>
+          </defs>
+
+          <g class="face-layer face-normal" data-face="normal">
+            <rect width="584" height="355" fill="#000" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="158" r="118" fill="white"></circle>
+              <g class="pupil-group pupil-left">
+                <circle cx="180" cy="158" r="64" fill="#0a0a0a"></circle>
+                <circle cx="207" cy="128" r="18" fill="white" opacity="0.92"></circle>
+                <circle cx="156" cy="190" r="10" fill="white" opacity="0.6"></circle>
+              </g>
+              <rect class="blink-lid lid-left" x="62" y="40" width="236" height="0" fill="white" clip-path="url(#eyeClipL)"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="158" r="118" fill="white"></circle>
+              <g class="pupil-group pupil-right">
+                <circle cx="404" cy="158" r="64" fill="#0a0a0a"></circle>
+                <circle cx="431" cy="128" r="18" fill="white" opacity="0.92"></circle>
+                <circle cx="380" cy="190" r="10" fill="white" opacity="0.6"></circle>
+              </g>
+              <rect class="blink-lid lid-right" x="286" y="40" width="236" height="0" fill="white" clip-path="url(#eyeClipR)"></rect>
+            </g>
+
+            <path d="M 116 36 Q 180 22 242 38" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.95"></path>
+            <path d="M 342 38 Q 404 22 468 36" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.95"></path>
+            <polygon points="292,308 278,290 306,290" fill="white" opacity="0.88"></polygon>
+            <path d="M 262 316 Q 278 332 292 322" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85"></path>
+            <path d="M 322 316 Q 306 332 292 322" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85"></path>
+
+            <line class="whisker" x1="80" y1="252" x2="-20" y2="232" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="80" y1="265" x2="-20" y2="265" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="80" y1="278" x2="-20" y2="296" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="252" x2="604" y2="232" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="265" x2="604" y2="265" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="278" x2="604" y2="296" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+          </g>
+
+          <g class="face-layer face-happy" data-face="happy">
+            <rect width="584" height="355" fill="#050400" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="158" r="118" fill="white"></circle>
+              <rect x="62" y="40" width="236" height="145" fill="#050400"></rect>
+              <g class="pupil-group pupil-left">
+                <circle cx="180" cy="230" r="48" fill="#0a0800"></circle>
+                <circle cx="202" cy="208" r="14" fill="white" opacity="0.9"></circle>
+                <circle cx="163" cy="248" r="8" fill="white" opacity="0.55"></circle>
+              </g>
+              <circle cx="210" cy="205" r="9" fill="white" opacity="0.95"></circle>
+              <rect class="blink-lid lid-left" x="62" y="40" width="236" height="0" fill="#050400" clip-path="url(#eyeClipL)"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="158" r="118" fill="white"></circle>
+              <rect x="286" y="40" width="236" height="145" fill="#050400"></rect>
+              <g class="pupil-group pupil-right">
+                <circle cx="404" cy="230" r="48" fill="#0a0800"></circle>
+                <circle cx="426" cy="208" r="14" fill="white" opacity="0.9"></circle>
+                <circle cx="387" cy="248" r="8" fill="white" opacity="0.55"></circle>
+              </g>
+              <circle cx="434" cy="205" r="9" fill="white" opacity="0.95"></circle>
+              <rect class="blink-lid lid-right" x="286" y="40" width="236" height="0" fill="#050400" clip-path="url(#eyeClipR)"></rect>
+            </g>
+
+            <path d="M 112 28 Q 180 10 244 30" stroke="white" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.97"></path>
+            <path d="M 340 30 Q 404 10 472 28" stroke="white" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.97"></path>
+            <polygon points="292,308 278,290 306,290" fill="#ffe8a0" opacity="0.92"></polygon>
+            <path class="happy-mouth" d="M 238 320 Q 292 355 346 320" stroke="#ffe8a0" stroke-width="5.5" stroke-linecap="round" fill="none" opacity="0.95"></path>
+            <path d="M 245 323 Q 292 352 339 323 L 335 330 Q 292 356 249 330 Z" fill="white" opacity="0.9"></path>
+            <line x1="268" y1="324" x2="266" y2="334" stroke="#ddd" stroke-width="1.5" opacity="0.8"></line>
+            <line x1="292" y1="324" x2="292" y2="336" stroke="#ddd" stroke-width="1.5" opacity="0.8"></line>
+            <line x1="316" y1="324" x2="318" y2="334" stroke="#ddd" stroke-width="1.5" opacity="0.8"></line>
+            <ellipse cx="292" cy="346" rx="20" ry="13" fill="#ff8fa3" opacity="0.95"></ellipse>
+            <line x1="292" y1="334" x2="292" y2="356" stroke="#ff6b8a" stroke-width="2" stroke-linecap="round" opacity="0.8"></line>
+            <ellipse cx="82" cy="272" rx="46" ry="24" fill="#ff9988" opacity="0.38"></ellipse>
+            <ellipse cx="502" cy="272" rx="46" ry="24" fill="#ff9988" opacity="0.38"></ellipse>
+
+            <line class="whisker" x1="80" y1="255" x2="-18" y2="228" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="80" y1="266" x2="-20" y2="264" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="80" y1="277" x2="-18" y2="296" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="255" x2="602" y2="228" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="266" x2="604" y2="264" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line class="whisker" x1="504" y1="277" x2="602" y2="296" stroke="#ffffaa" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+
+            <circle class="svg-sparkle" cx="52" cy="60" r="5" fill="#ffe066" opacity="0"></circle>
+            <circle class="svg-sparkle" cx="532" cy="55" r="4" fill="#ff69b4" opacity="0"></circle>
+            <circle class="svg-sparkle" cx="44" cy="300" r="4" fill="#66ffcc" opacity="0"></circle>
+            <circle class="svg-sparkle" cx="540" cy="295" r="5" fill="#ffe066" opacity="0"></circle>
+            <circle class="svg-sparkle" cx="292" cy="22" r="4" fill="#ff69b4" opacity="0"></circle>
+          </g>
+
+          <g class="face-layer face-angry" data-face="angry">
+            <rect width="584" height="355" fill="#080000" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="158" r="118" fill="#fff5f5"></circle>
+              <g class="pupil-group pupil-left">
+                <circle cx="180" cy="158" r="64" fill="#0a0000"></circle>
+                <circle cx="207" cy="128" r="16" fill="white" opacity="0.8"></circle>
+                <circle cx="156" cy="190" r="8" fill="white" opacity="0.5"></circle>
+              </g>
+              <polygon points="62,40 298,40 298,130 180,185 62,120" fill="#080000"></polygon>
+              <rect class="blink-lid lid-left" x="62" y="40" width="236" height="0" fill="#080000" clip-path="url(#eyeClipL)"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="158" r="118" fill="#fff5f5"></circle>
+              <g class="pupil-group pupil-right">
+                <circle cx="404" cy="158" r="64" fill="#0a0000"></circle>
+                <circle cx="431" cy="128" r="16" fill="white" opacity="0.8"></circle>
+                <circle cx="380" cy="190" r="8" fill="white" opacity="0.5"></circle>
+              </g>
+              <polygon points="286,40 522,40 522,120 404,185 286,130" fill="#080000"></polygon>
+              <rect class="blink-lid lid-right" x="286" y="40" width="236" height="0" fill="#080000" clip-path="url(#eyeClipR)"></rect>
+            </g>
+
+            <line x1="110" y1="16" x2="250" y2="62" stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.97"></line>
+            <line x1="334" y1="62" x2="474" y2="16" stroke="white" stroke-width="10" stroke-linecap="round" opacity="0.97"></line>
+            <polygon points="292,308 278,290 306,290" fill="#ffcccc" opacity="0.9"></polygon>
+            <path class="angry-mouth" d="M 248 340 Q 292 310 336 340" stroke="#ffcccc" stroke-width="5.5" stroke-linecap="round" fill="none" opacity="0.9"></path>
+            <line x1="263" y1="328" x2="263" y2="337" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line x1="278" y1="323" x2="278" y2="333" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line x1="292" y1="321" x2="292" y2="331" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line x1="306" y1="323" x2="306" y2="333" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+            <line x1="321" y1="328" x2="321" y2="337" stroke="#ffcccc" stroke-width="3" stroke-linecap="round" opacity="0.7"></line>
+
+            <line class="whisker" x1="80" y1="258" x2="-18" y2="222" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="80" y1="268" x2="-20" y2="258" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="80" y1="278" x2="-18" y2="295" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="504" y1="258" x2="602" y2="222" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="504" y1="268" x2="604" y2="258" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="504" y1="278" x2="602" y2="295" stroke="#ffaaaa" stroke-width="3.5" stroke-linecap="round" opacity="0.75"></line>
+
+            <g class="anger-vein vein-left" opacity="0">
+              <path d="M 54 54 L 64 44 L 74 52 L 84 36" stroke="#ff3300" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            </g>
+            <g class="anger-vein vein-right" opacity="0">
+              <path d="M 530 54 L 520 44 L 510 52 L 500 36" stroke="#ff3300" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            </g>
+          </g>
+
+          <g class="face-layer face-sad" data-face="sad">
+            <rect width="584" height="355" fill="url(#sadBgGrad)" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="165" r="115" fill="white" opacity="0.88"></circle>
+              <circle cx="180" cy="165" r="72" fill="#4a5580"></circle>
+              <g class="pupil-group pupil-left">
+                <circle cx="174" cy="170" r="50" fill="#030308"></circle>
+                <circle cx="190" cy="150" r="12" fill="white" opacity="0.65"></circle>
+                <circle cx="164" cy="185" r="7" fill="white" opacity="0.35"></circle>
+              </g>
+              <rect x="62" y="40" width="236" height="107" fill="#000002" clip-path="url(#eyeClipL)"></rect>
+              <path d="M 62 147 Q 180 136 298 147" stroke="#000002" stroke-width="7" fill="none"></path>
+              <path d="M 76 240 Q 180 255 284 240" stroke="#9fb4ff" stroke-width="4" fill="none" opacity="0.3"></path>
+              <rect class="blink-lid lid-left" x="62" y="40" width="236" height="0" fill="#000002" clip-path="url(#eyeClipL)"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="165" r="115" fill="white" opacity="0.88"></circle>
+              <circle cx="404" cy="165" r="72" fill="#4a5580"></circle>
+              <g class="pupil-group pupil-right">
+                <circle cx="398" cy="170" r="50" fill="#030308"></circle>
+                <circle cx="414" cy="150" r="12" fill="white" opacity="0.65"></circle>
+                <circle cx="388" cy="185" r="7" fill="white" opacity="0.35"></circle>
+              </g>
+              <rect x="286" y="40" width="236" height="107" fill="#000002" clip-path="url(#eyeClipR)"></rect>
+              <path d="M 286 147 Q 404 136 522 147" stroke="#000002" stroke-width="7" fill="none"></path>
+              <path d="M 300 240 Q 404 255 508 240" stroke="#9fb4ff" stroke-width="4" fill="none" opacity="0.3"></path>
+              <rect class="blink-lid lid-right" x="286" y="40" width="236" height="0" fill="#000002" clip-path="url(#eyeClipR)"></rect>
+            </g>
+
+            <path d="M 116 56 Q 168 44 238 60" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.85" transform="rotate(8 180 50)"></path>
+            <path d="M 346 60 Q 416 44 468 56" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.85" transform="rotate(-8 404 50)"></path>
+            <polygon points="292,308 278,292 306,292" fill="white" opacity="0.7"></polygon>
+            <path class="sad-mouth-left" d="M 254 328 Q 272 314 292 320" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8"></path>
+            <path class="sad-mouth-right" d="M 330 328 Q 312 314 292 320" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8"></path>
+
+            <ellipse class="tear tear-left" cx="155" cy="258" rx="5" ry="7" fill="#b4d2ff" opacity="0.75" filter="url(#tearBlur)"></ellipse>
+            <ellipse class="tear tear-right" cx="428" cy="258" rx="5" ry="7" fill="#b4d2ff" opacity="0.75" filter="url(#tearBlur)"></ellipse>
+
+            <line class="whisker" x1="78" y1="262" x2="-20" y2="252" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <line class="whisker" x1="78" y1="272" x2="-20" y2="278" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <line class="whisker" x1="78" y1="282" x2="-20" y2="308" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <line class="whisker" x1="506" y1="262" x2="604" y2="252" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <line class="whisker" x1="506" y1="272" x2="604" y2="278" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <line class="whisker" x1="506" y1="282" x2="604" y2="308" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"></line>
+            <ellipse cx="180" cy="282" rx="58" ry="10" fill="#000014" opacity="0.5"></ellipse>
+            <ellipse cx="404" cy="282" rx="58" ry="10" fill="#000014" opacity="0.5"></ellipse>
+          </g>
+
+          <g class="face-layer face-excited" data-face="excited">
+            <rect width="584" height="355" fill="url(#excitedBgGrad)" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="158" r="122" fill="white"></circle>
+              <circle cx="180" cy="158" r="80" fill="#c8860a"></circle>
+              <g class="pupil-group pupil-left">
+                <circle cx="180" cy="158" r="55" fill="#050300"></circle>
+                <circle cx="210" cy="122" r="22" fill="white" opacity="0.95"></circle>
+                <circle cx="155" cy="193" r="11" fill="white" opacity="0.65"></circle>
+                <circle cx="200" cy="175" r="7" fill="white" opacity="0.45"></circle>
+              </g>
+              <rect class="blink-lid lid-left" x="58" y="36" width="244" height="0" fill="white"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="158" r="122" fill="white"></circle>
+              <circle cx="404" cy="158" r="80" fill="#c8860a"></circle>
+              <g class="pupil-group pupil-right">
+                <circle cx="404" cy="158" r="55" fill="#050300"></circle>
+                <circle cx="434" cy="122" r="22" fill="white" opacity="0.95"></circle>
+                <circle cx="379" cy="193" r="11" fill="white" opacity="0.65"></circle>
+                <circle cx="424" cy="175" r="7" fill="white" opacity="0.45"></circle>
+              </g>
+              <rect class="blink-lid lid-right" x="282" y="36" width="244" height="0" fill="white"></rect>
+            </g>
+
+            <path d="M 108 18 Q 180 0 250 16" stroke="white" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.95"></path>
+            <path d="M 334 16 Q 404 0 476 18" stroke="white" stroke-width="8" stroke-linecap="round" fill="none" opacity="0.95"></path>
+            <polygon points="292,298 276,280 308,280" fill="white" opacity="0.9"></polygon>
+            <path d="M 238 310 Q 265 342 292 326" stroke="white" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"></path>
+            <path d="M 346 310 Q 319 342 292 326" stroke="white" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"></path>
+            <ellipse cx="292" cy="338" rx="30" ry="14" fill="white" opacity="0.15"></ellipse>
+
+            <line class="whisker" x1="78" y1="248" x2="-30" y2="220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="78" y1="262" x2="-30" y2="262" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="78" y1="276" x2="-30" y2="302" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="506" y1="248" x2="614" y2="220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="506" y1="262" x2="614" y2="262" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <line class="whisker" x1="506" y1="276" x2="614" y2="302" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"></line>
+            <circle cx="120" cy="230" r="36" fill="#ff6b35" opacity="0.13"></circle>
+            <circle cx="464" cy="230" r="36" fill="#ff6b35" opacity="0.13"></circle>
+          </g>
+
+          <g class="face-layer face-sleepy" data-face="sleepy">
+            <rect width="584" height="355" fill="url(#sleepyBgGrad)" rx="42"></rect>
+
+            <g class="eye-group eye-left">
+              <circle cx="180" cy="158" r="118" fill="white" opacity="0.9"></circle>
+              <circle cx="180" cy="158" r="76" fill="#6a6aaa"></circle>
+              <g class="pupil-group pupil-left">
+                <circle cx="180" cy="166" r="48" fill="#05050a"></circle>
+                <circle cx="200" cy="148" r="14" fill="white" opacity="0.7"></circle>
+                <circle cx="163" cy="185" r="8" fill="white" opacity="0.4"></circle>
+              </g>
+              <rect x="62" y="40" width="236" height="146" fill="#000005" clip-path="url(#eyeClipL)"></rect>
+              <path d="M 62 186 Q 180 178 298 186" stroke="#000005" stroke-width="6" fill="none"></path>
+              <path d="M 76 230 Q 180 248 284 230" stroke="#b4b4ff" stroke-width="5" fill="none" opacity="0.18"></path>
+              <rect class="blink-lid lid-left" x="62" y="40" width="236" height="0" fill="#000005" clip-path="url(#eyeClipL)"></rect>
+            </g>
+
+            <g class="eye-group eye-right">
+              <circle cx="404" cy="158" r="118" fill="white" opacity="0.9"></circle>
+              <circle cx="404" cy="158" r="76" fill="#6a6aaa"></circle>
+              <g class="pupil-group pupil-right">
+                <circle cx="404" cy="166" r="48" fill="#05050a"></circle>
+                <circle cx="424" cy="148" r="14" fill="white" opacity="0.7"></circle>
+                <circle cx="387" cy="185" r="8" fill="white" opacity="0.4"></circle>
+              </g>
+              <rect x="286" y="40" width="236" height="146" fill="#000005" clip-path="url(#eyeClipR)"></rect>
+              <path d="M 286 186 Q 404 178 522 186" stroke="#000005" stroke-width="6" fill="none"></path>
+              <path d="M 300 230 Q 404 248 508 230" stroke="#b4b4ff" stroke-width="5" fill="none" opacity="0.18"></path>
+              <rect class="blink-lid lid-right" x="286" y="40" width="236" height="0" fill="#000005" clip-path="url(#eyeClipR)"></rect>
+            </g>
+
+            <path d="M 118 50 Q 180 46 240 52" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.7"></path>
+            <path d="M 344 52 Q 404 46 466 50" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.7"></path>
+            <polygon points="292,308 278,292 306,292" fill="white" opacity="0.7"></polygon>
+            <path d="M 270 318 Q 292 328 314 318" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.7"></path>
+
+            <line class="whisker" x1="80" y1="260" x2="-18" y2="244" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <line class="whisker" x1="80" y1="270" x2="-18" y2="272" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <line class="whisker" x1="80" y1="280" x2="-18" y2="300" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <line class="whisker" x1="504" y1="260" x2="602" y2="244" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <line class="whisker" x1="504" y1="270" x2="602" y2="272" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <line class="whisker" x1="504" y1="280" x2="602" y2="300" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.5"></line>
+            <ellipse cx="180" cy="278" rx="60" ry="12" fill="#000014" opacity="0.4"></ellipse>
+            <ellipse cx="404" cy="278" rx="60" ry="12" fill="#000014" opacity="0.4"></ellipse>
+          </g>
+        </svg>
+
+        <div class="assignment-panel" id="assignmentPanel" aria-hidden="true">
+          <header class="ap-header">
+            <button type="button" class="ap-back" id="apBack" aria-label="Back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+            </button>
+            <h2 class="ap-title" id="apTitle">New Task</h2>
+            <span class="ap-spacer" aria-hidden="true"></span>
+          </header>
+
+          <div class="ap-body">
+            <section class="ap-step is-active" data-step="type">
+              <p class="ap-subtitle">What would you like the robot to do?</p>
+              <div class="ap-grid">
+                <button type="button" class="ap-tile" data-task-type="food">
+                  <span class="ap-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 2v7a2 2 0 002 2h0a2 2 0 002-2V2"></path>
+                      <path d="M6 11v11"></path>
+                      <path d="M18 2c-1.8 0-3 2.5-3 5.5S16.2 12 18 12v10"></path>
+                    </svg>
+                  </span>
+                  <span class="ap-tile-label">Food &amp; Beverage</span>
+                </button>
+                <button type="button" class="ap-tile" data-task-type="item">
+                  <span class="ap-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 8l9-5 9 5-9 5-9-5z"></path>
+                      <path d="M3 8v9l9 5 9-5V8"></path>
+                      <path d="M12 13v9"></path>
+                    </svg>
+                  </span>
+                  <span class="ap-tile-label">Item / Amenity</span>
+                </button>
+                <button type="button" class="ap-tile" data-task-type="housekeeping">
+                  <span class="ap-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 3l-8.5 8.5"></path>
+                      <path d="M9 14l-4.5 4.5"></path>
+                      <path d="M6 11.5L2.5 19 10 15.5"></path>
+                      <path d="M9 14l3 3"></path>
+                    </svg>
+                  </span>
+                  <span class="ap-tile-label">Housekeeping</span>
+                </button>
+                <button type="button" class="ap-tile" data-task-type="other">
+                  <span class="ap-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="5" y="4" width="14" height="17" rx="2"></rect>
+                      <rect x="9" y="2" width="6" height="4" rx="1"></rect>
+                      <path d="M9 11h6"></path>
+                      <path d="M9 15h6"></path>
+                    </svg>
+                  </span>
+                  <span class="ap-tile-label">Other Task</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="ap-step" data-step="details">
+              <p class="ap-subtitle" id="apDetailsSubtitle">Delivery details</p>
+
+              <label class="ap-field">
+                <span>Room Number</span>
+                <select class="ap-select" id="apRoomSelect">
+                  <option value="">Select room&#8230;</option>
+                  <option value="__custom">Other / Manual entry</option>
+                </select>
+              </label>
+
+              <label class="ap-field" id="apCustomRoomField" hidden>
+                <span>Enter Room Number</span>
+                <input type="text" class="ap-input" id="apCustomRoom" inputmode="numeric" placeholder="e.g. 614">
+              </label>
+
+              <label class="ap-field">
+                <span>Notes / Items</span>
+                <textarea class="ap-textarea" id="apNotes" rows="2" placeholder="e.g. 2 towels, toothpaste"></textarea>
+              </label>
+
+              <button type="button" class="ap-primary" id="apConfirmBtn" disabled>Assign Task</button>
+            </section>
+
+            <section class="ap-step" data-step="confirm">
+              <div class="ap-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"></path></svg>
+              </div>
+              <p class="ap-confirm-title">Task Assigned</p>
+              <p class="ap-confirm-detail" id="apConfirmDetail">Room &#8212; </p>
+              <button type="button" class="ap-primary" id="apDoneBtn">Done</button>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="debug-panel" id="debugPanel" aria-label="Emotion debug controls">
+      <button type="button" data-emotion-button="normal">Normal</button>
+      <button type="button" data-emotion-button="happy">Happy</button>
+      <button type="button" data-emotion-button="angry">Angry</button>
+      <button type="button" data-emotion-button="sad">Sad</button>
+      <button type="button" data-emotion-button="excited">Excited</button>
+      <button type="button" data-emotion-button="sleepy">Sleepy</button>
+    </aside>
+  </main>
+
+  <script src="emotions/normal.js"></script>
+  <script src="emotions/happy.js"></script>
+  <script src="emotions/angry.js"></script>
+  <script src="emotions/sad.js"></script>
+  <script src="emotions/excited.js"></script>
+  <script src="emotions/sleepy.js"></script>
+  <script src="script.js"></script>
+  <script src="assignment.js"></script>
+</body>
+</html>

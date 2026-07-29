@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Excited Cat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #0a0a12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Glow pulse behind the bezel */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(255,200,0,0.12) 0%, transparent 70%);
+    animation: glowPulse 0.6s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes glowPulse {
+    from { transform: scale(0.95); opacity: 0.6; }  
+    to   { transform: scale(1.05); opacity: 1; }
+  }
+
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #111;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #161616,
+      0 0 0 14px #0d0d0d,
+      0 0 60px rgba(255,200,0,0.18),
+      0 0 120px rgba(255,200,0,0.07);
+    animation: bezelBounce 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes bezelBounce {
+    from { transform: translateY(0px) rotate(-0.4deg); }
+    to   { transform: translateY(-5px) rotate(0.4deg); }
+  }
+
+  /* Cat ears */
+  .ears {
+    position: absolute;
+    top: -72px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #111;
+    position: relative;
+    transform-origin: bottom center;
+    animation: earExcited 0.4s ease-in-out infinite alternate;
+  }
+  .ear-right { animation-direction: alternate-reverse; }
+
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #1a0c00;
+  }
+
+  @keyframes earExcited {
+    from { transform: rotate(-12deg) scaleX(0.9); }
+    to   { transform: rotate(10deg) scaleX(1.05); }
+  }
+
+  /* Screen */
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* warm glow on screen */
+  .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255,200,0,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 40;
+    border-radius: 42px;
+  }
+
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Stars/sparkles that burst around during excitement */
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 45;
+    font-size: 18px;
+    animation: sparklePop 1.2s ease-out infinite;
+    opacity: 0;
+  }
+  .sparkle:nth-child(1)  { top: 12%;  left: 8%;  animation-delay: 0s; }
+  .sparkle:nth-child(2)  { top: 8%;   left: 82%; animation-delay: 0.3s; }
+  .sparkle:nth-child(3)  { top: 65%;  left: 5%;  animation-delay: 0.6s; }
+  .sparkle:nth-child(4)  { top: 72%;  left: 88%; animation-delay: 0.9s; }
+  .sparkle:nth-child(5)  { top: 30%;  left: 93%; animation-delay: 0.15s; }
+  .sparkle:nth-child(6)  { top: 85%;  left: 50%; animation-delay: 0.45s; }
+
+  @keyframes sparklePop {
+    0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+    30%  { opacity: 1; transform: scale(1.4) rotate(20deg); }
+    70%  { opacity: 0.8; transform: scale(1) rotate(-10deg); }
+    100% { opacity: 0; transform: scale(0) rotate(30deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <!-- Sparkles -->
+    <div class="sparkle">✦</div>
+    <div class="sparkle">★</div>
+    <div class="sparkle">✦</div>
+    <div class="sparkle">★</div>
+    <div class="sparkle">✦</div>
+    <div class="sparkle">★</div>
+
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <!-- BACKGROUND with warm tint -->
+      <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#0d0800"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+        <!-- Star burst filter -->
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="584" height="355" fill="url(#bgGrad)" rx="42"/>
+
+      <!-- ══ LEFT EYE — wide open, big shiny pupils ══ -->
+      <g id="eyeGroupL">
+        <circle cx="180" cy="158" r="122" fill="white"/>
+        <!-- Iris — golden excited color ring -->
+        <circle cx="180" cy="158" r="80" fill="#c8860a"/>
+        <g id="pupilGroupL">
+          <circle cx="180" cy="158" r="55" fill="#050300"/>
+          <!-- big gleam -->
+          <circle cx="210" cy="122" r="22" fill="white" opacity="0.95"/>
+          <circle cx="155" cy="193" r="11" fill="white" opacity="0.65"/>
+          <!-- extra gleam for excitement -->
+          <circle cx="200" cy="175" r="7" fill="white" opacity="0.45"/>
+        </g>
+        <!-- No lid (wide open!) -->
+      </g>
+
+      <!-- ══ RIGHT EYE ══ -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="158" r="122" fill="white"/>
+        <circle cx="404" cy="158" r="80" fill="#c8860a"/>
+        <g id="pupilGroupR">
+          <circle cx="404" cy="158" r="55" fill="#050300"/>
+          <circle cx="434" cy="122" r="22" fill="white" opacity="0.95"/>
+          <circle cx="379" cy="193" r="11" fill="white" opacity="0.65"/>
+          <circle cx="424" cy="175" r="7" fill="white" opacity="0.45"/>
+        </g>
+      </g>
+
+      <!-- ══ EYEBROWS — raised high & arched ══ -->
+      <path id="browL"
+            d="M 108 18 Q 180 0 250 16"
+            stroke="white" stroke-width="8"
+            stroke-linecap="round" fill="none" opacity="0.95"/>
+      <path id="browR"
+            d="M 334 16 Q 404 0 476 18"
+            stroke="white" stroke-width="8"
+            stroke-linecap="round" fill="none" opacity="0.95"/>
+
+      <!-- ══ NOSE ══ -->
+      <polygon points="292,298  276,280  308,280"
+               fill="white" opacity="0.9"/>
+
+      <!-- ══ MOUTH — big wide happy open smile ══ -->
+      <!-- Left cheek rise -->
+      <path d="M 238 310 Q 265 342 292 326"
+            stroke="white" stroke-width="6"
+            stroke-linecap="round" fill="none" opacity="0.9"/>
+      <!-- Right cheek rise -->
+      <path d="M 346 310 Q 319 342 292 326"
+            stroke="white" stroke-width="6"
+            stroke-linecap="round" fill="none" opacity="0.9"/>
+      <!-- Open mouth oval -->
+      <ellipse cx="292" cy="338" rx="30" ry="14" fill="white" opacity="0.15"/>
+
+      <!-- ══ WHISKERS — spread wide in excitement ══ -->
+      <!-- LEFT -->
+      <line x1="78"  y1="248" x2="-30" y2="220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <line x1="78"  y1="262" x2="-30" y2="262" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <line x1="78"  y1="276" x2="-30" y2="302" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <!-- RIGHT -->
+      <line x1="506" y1="248" x2="614" y2="220" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <line x1="506" y1="262" x2="614" y2="262" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+      <line x1="506" y1="276" x2="614" y2="302" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+
+      <!-- ══ Rosy cheeks ══ -->
+      <circle cx="120" cy="230" r="36" fill="#ff6b35" opacity="0.13"/>
+      <circle cx="464" cy="230" r="36" fill="#ff6b35" opacity="0.13"/>
+
+    </svg>
+  </div>
+</div>
+
+<script>
+const screen    = document.getElementById('screen');
+const pupilL    = document.getElementById('pupilGroupL');
+const pupilR    = document.getElementById('pupilGroupR');
+const faceSvg   = document.getElementById('faceSvg');
+
+/* Pupil tracking */
+document.addEventListener('mousemove', e => {
+  const r  = screen.getBoundingClientRect();
+  const dx = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width/2) / (r.width/2)));
+  const dy = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height/2) / (r.height/2)));
+  const ox = dx * 14, oy = dy * 14;
+  pupilL.setAttribute('transform', `translate(${ox},${oy})`);
+  pupilR.setAttribute('transform', `translate(${ox},${oy})`);
+});
+document.addEventListener('mouseleave', () => {
+  pupilL.setAttribute('transform', '');
+  pupilR.setAttribute('transform', '');
+});
+
+/* Excited bounce float */
+let t = 0;
+(function loop() {
+  t += 0.045;
+  const dy = Math.sin(t) * 4 + Math.sin(t * 2.3) * 2;
+  faceSvg.style.transform = `translateY(${dy}px)`;
+  requestAnimationFrame(loop);
+})();
+
+/* Rapid blink (excited cats blink fast) */
+let blinking = false;
+function doBlink() {
+  if (blinking) return;
+  blinking = true;
+  let frame = 0, dir = 1;
+  const lidL = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  const lidR = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  [lidL, lidR].forEach((l, i) => {
+    l.setAttribute('x', i === 0 ? '58' : '282');
+    l.setAttribute('y', '36');
+    l.setAttribute('width', '244');
+    l.setAttribute('height', '0');
+    l.setAttribute('fill', 'white');
+    document.getElementById(i === 0 ? 'eyeGroupL' : 'eyeGroupR').appendChild(l);
+  });
+  const tick = () => {
+    frame += dir;
+    const h = Math.round((frame / 8) * 244);
+    lidL.setAttribute('height', h);
+    lidR.setAttribute('height', h);
+    if (dir === 1 && frame >= 8) dir = -1;
+    if (dir === -1 && frame <= 0) {
+      lidL.remove(); lidR.remove();
+      blinking = false;
+      setTimeout(doBlink, 800 + Math.random() * 1200);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(doBlink, 600);
+
+/* Whisker twitch */
+const allWhiskers = ['wL1','wL2','wL3','wR1','wR2','wR3']
+  .map(id => document.getElementById(id)).filter(Boolean);
+function twitch() {
+  allWhiskers.forEach(w => {
+    if (w) { w.setAttribute('opacity','1'); setTimeout(()=>w.setAttribute('opacity','0.75'),150); }
+  });
+  setTimeout(twitch, 500 + Math.random() * 600);
+}
+setTimeout(twitch, 400);
+</script>
+</body>
+</html>

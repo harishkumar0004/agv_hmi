@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Cat Face Display</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ── Physical bezel ── */
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #111;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #161616,
+      0 0 0 14px #0d0d0d,
+      0 0 50px rgba(0,0,0,0.9);
+  }
+
+  /* ── Cat ears on bezel top ── */
+  .ears {
+    position: absolute;
+    top: -64px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #111;
+    position: relative;
+    transform-origin: bottom center;
+    animation: earTwitch 7s ease-in-out infinite;
+  }
+  .ear-right { animation-delay: 0.5s; }
+
+  /* inner ear */
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #1a0808;
+  }
+
+  @keyframes earTwitch {
+    0%,65%,100% { transform: rotate(0deg); }
+    70%          { transform: rotate(-8deg) scaleX(0.92); }
+    78%          { transform: rotate(5deg); }
+    85%          { transform: rotate(-2deg); }
+    92%          { transform: rotate(0deg); }
+  }
+
+  /* ── Screen ── */
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* scanline overlay */
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,255,0.013) 3px, rgba(255,255,255,0.013) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  /* ── Face SVG fills the whole screen ── */
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+
+    <!-- Everything drawn in SVG so proportions are pixel-perfect -->
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ══ BACKGROUND ══ -->
+      <rect width="584" height="355" fill="#000" rx="42"/>
+
+      <!-- ══════════════════════════════════════
+           LEFT EYE  (centre ~180, 158)
+           radius 118  →  big enough to nearly fill height
+      ══════════════════════════════════════ -->
+      <g id="eyeGroupL">
+        <!-- White sclera -->
+        <circle cx="180" cy="158" r="118" fill="white"/>
+
+        <!-- Pupil group — moves for tracking -->
+        <g id="pupilGroupL">
+          <!-- Big black pupil -->
+          <circle cx="180" cy="158" r="64" fill="#0a0a0a"/>
+          <!-- Shine big -->
+          <circle cx="207" cy="128" r="18" fill="white" opacity="0.92"/>
+          <!-- Shine small -->
+          <circle cx="156" cy="190" r="10" fill="white" opacity="0.6"/>
+        </g>
+
+        <!-- Blink lid — white circle sliding down from top -->
+        <clipPath id="eyeClipL">
+          <rect x="62" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidL" x="62" y="40" width="236" height="0" fill="white"
+              clip-path="url(#eyeClipL)"/>
+      </g>
+
+      <!-- ══════════════════════════════════════
+           RIGHT EYE  (centre ~404, 158)
+      ══════════════════════════════════════ -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="158" r="118" fill="white"/>
+        <g id="pupilGroupR">
+          <circle cx="404" cy="158" r="64" fill="#0a0a0a"/>
+          <circle cx="431" cy="128" r="18" fill="white" opacity="0.92"/>
+          <circle cx="380" cy="190" r="10" fill="white" opacity="0.6"/>
+        </g>
+        <clipPath id="eyeClipR">
+          <rect x="286" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <rect id="lidR" x="286" y="40" width="236" height="0" fill="white"
+              clip-path="url(#eyeClipR)"/>
+      </g>
+
+      <!-- ══════════════════════════════════════
+           EYEBROWS  — thin arched strokes
+           Sit just above each eye, close together near centre
+      ══════════════════════════════════════ -->
+      <!-- Left brow — arches over left eye, inner end near centre -->
+      <path id="browL"
+            d="M 116 36 Q 180 22 242 38"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.95"/>
+
+      <!-- Right brow -->
+      <path id="browR"
+            d="M 342 38 Q 404 22 468 36"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.95"/>
+
+      <!-- ══════════════════════════════════════
+           NOSE  — small inverted triangle
+           Centered at x=292, just below the gap between eyes (y≈292)
+      ══════════════════════════════════════ -->
+      <polygon id="nose"
+               points="292,308  278,290  306,290"
+               fill="white" opacity="0.88"/>
+
+      <!-- ══════════════════════════════════════
+           MOUTH  — W / kitty shape below nose
+      ══════════════════════════════════════ -->
+      <!-- Left lip curve -->
+      <path d="M 262 316 Q 278 332 292 322"
+            stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.85"/>
+      <!-- Right lip curve -->
+      <path d="M 322 316 Q 306 332 292 322"
+            stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.85"/>
+
+      <!-- ══════════════════════════════════════
+           WHISKERS
+           Left side: 3 lines from bottom-outer corner of left eye (~80,260)
+           Right side: 3 lines from bottom-outer corner of right eye (~508,260)
+           Fan outward horizontally
+      ══════════════════════════════════════ -->
+
+      <!-- LEFT whiskers — origin ~(80, 265) -->
+      <line id="wL1" x1="80"  y1="252" x2="-20" y2="232"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line id="wL2" x1="80"  y1="265" x2="-20" y2="265"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line id="wL3" x1="80"  y1="278" x2="-20" y2="296"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- RIGHT whiskers — origin ~(504, 265) -->
+      <line id="wR1" x1="504" y1="252" x2="604" y2="232"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line id="wR2" x1="504" y1="265" x2="604" y2="265"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+      <line id="wR3" x1="504" y1="278" x2="604" y2="296"
+            stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+    </svg>
+
+  </div><!-- /screen -->
+</div><!-- /bezel -->
+
+<script>
+/* ── Cached elements ── */
+const screen      = document.getElementById('screen');
+const pupilL      = document.getElementById('pupilGroupL');
+const pupilR      = document.getElementById('pupilGroupR');
+const lidL        = document.getElementById('lidL');
+const lidR        = document.getElementById('lidR');
+const browL       = document.getElementById('browL');
+const browR       = document.getElementById('browR');
+const eyeGroupL   = document.getElementById('eyeGroupL');
+const eyeGroupR   = document.getElementById('eyeGroupR');
+const faceSvg     = document.getElementById('faceSvg');
+
+/* ── Pupil tracking ── */
+document.addEventListener('mousemove', e => {
+  const r   = screen.getBoundingClientRect();
+  const cx  = r.left + r.width  / 2;
+  const cy  = r.top  + r.height / 2;
+  const dx  = Math.max(-1, Math.min(1, (e.clientX - cx) / (r.width  / 2)));
+  const dy  = Math.max(-1, Math.min(1, (e.clientY - cy) / (r.height / 2)));
+  const max = 11;
+  const ox  = dx * max;
+  const oy  = dy * max;
+  pupilL.setAttribute('transform', `translate(${ox},${oy})`);
+  pupilR.setAttribute('transform', `translate(${ox},${oy})`);
+});
+
+document.addEventListener('mouseleave', () => {
+  pupilL.setAttribute('transform', '');
+  pupilR.setAttribute('transform', '');
+});
+
+/* ── BLINK ──
+   Animate lid rect height from 0 → 236 (full eye diameter) then back */
+let blinking = false;
+
+function doBlink() {
+  if (blinking) return;
+  blinking = true;
+
+  const steps  = 12;
+  const fullH  = 236;  /* eye diameter */
+  let   frame  = 0;
+  let   dir    = 1;    /* 1 = closing, -1 = opening */
+
+  const tick = () => {
+    frame += dir;
+    const h = Math.round((frame / steps) * fullH);
+    lidL.setAttribute('height', h);
+    lidR.setAttribute('height', h);
+
+    if (dir === 1 && frame >= steps) { dir = -1; }
+
+    if (dir === -1 && frame <= 0) {
+      lidL.setAttribute('height', 0);
+      lidR.setAttribute('height', 0);
+      blinking = false;
+      schedBlink();
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
+}
+
+function schedBlink() {
+  setTimeout(doBlink, 2800 + Math.random() * 3000);
+}
+schedBlink();
+
+/* ── IDLE FLOAT (whole SVG translate) ── */
+let floatT = 0;
+const floatAmp = 6;
+(function floatLoop() {
+  floatT += 0.018;
+  const dy = Math.sin(floatT) * floatAmp;
+  faceSvg.style.transform = `translateY(${dy}px)`;
+  requestAnimationFrame(floatLoop);
+})();
+
+/* ── WHISKER TWITCH ── */
+const whiskersL = ['wL1','wL2','wL3'].map(id => document.getElementById(id));
+const whiskersR = ['wR1','wR2','wR3'].map(id => document.getElementById(id));
+
+function twitchWhiskers() {
+  /* fan out left whiskers a little */
+  whiskersL.forEach((w, i) => {
+    const spread = [-8, 0, 8];
+    w.setAttribute('opacity','1');
+    setTimeout(() => w.setAttribute('opacity','0.7'), 220);
+  });
+  whiskersR.forEach((w, i) => {
+    w.setAttribute('opacity','1');
+    setTimeout(() => w.setAttribute('opacity','0.7'), 220);
+  });
+  setTimeout(twitchWhiskers, 3500 + Math.random() * 3000);
+}
+setTimeout(twitchWhiskers, 2000);
+
+/* ── EMOTION CYCLES ──
+   idle → happy (squish eyes) → alert (wide pupils) → sleepy (half-lid) → idle … */
+const emotions = ['idle','happy','alert','idle','sleepy','idle'];
+let eIdx = 0;
+
+function applyEmotion(em) {
+  /* reset */
+  eyeGroupL.setAttribute('transform','');
+  eyeGroupR.setAttribute('transform','');
+  browL.setAttribute('d','M 116 36 Q 180 22 242 38');
+  browR.setAttribute('d','M 342 38 Q 404 22 468 36');
+
+  switch(em) {
+    case 'happy':
+      /* Squish eyes to ~55 % height from bottom — looks like ^^ */
+      eyeGroupL.setAttribute('transform','translate(0,0) scale(1, 0.52) translate(0, 152)');
+      eyeGroupR.setAttribute('transform','translate(0,0) scale(1, 0.52) translate(0, 152)');
+      /* raise brows */
+      browL.setAttribute('d','M 116 24 Q 180 8 242 26');
+      browR.setAttribute('d','M 342 26 Q 404 8 468 24');
+      break;
+
+    case 'alert':
+      /* Eyes a little bigger, brows shoot up */
+      eyeGroupL.setAttribute('transform','scale(1.06) translate(-10,-5)');
+      eyeGroupR.setAttribute('transform','scale(1.06) translate(-10,-5)');
+      browL.setAttribute('d','M 116 18 Q 180 4 242 20');
+      browR.setAttribute('d','M 342 20 Q 404 4 468 18');
+      break;
+
+    case 'sleepy':
+      /* Half-close: lid stays at 50 % */
+      lidL.setAttribute('height', 118);
+      lidR.setAttribute('height', 118);
+      browL.setAttribute('d','M 116 42 Q 180 34 242 44');
+      browR.setAttribute('d','M 342 44 Q 404 34 468 42');
+      return; /* don't re-open lids via schedBlink during sleepy */
+
+    default: /* idle */
+      break;
+  }
+}
+
+function nextEmotion() {
+  eIdx = (eIdx + 1) % emotions.length;
+
+  /* if coming out of sleepy, fully open lids */
+  lidL.setAttribute('height', 0);
+  lidR.setAttribute('height', 0);
+
+  applyEmotion(emotions[eIdx]);
+  setTimeout(nextEmotion, 5000 + Math.random() * 2000);
+}
+setTimeout(nextEmotion, 5000);
+
+/* ── Click / tap → ear flinch ── */
+const ears = document.querySelectorAll('.ear');
+screen.addEventListener('click', () => {
+  ears.forEach(ear => {
+    ear.style.transition = 'transform 0.12s ease';
+    ear.style.transform  = 'rotate(-14deg) scaleX(0.88)';
+    setTimeout(() => { ear.style.transform = 'rotate(7deg)'; }, 130);
+    setTimeout(() => { ear.style.transform = ''; }, 280);
+  });
+});
+</script>
+</body>
+</html>

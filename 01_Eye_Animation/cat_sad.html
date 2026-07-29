@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Sad Cat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 800px;
+    height: 480px;
+    background: #060608;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* dim rain ambient */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(40,50,80,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .bezel {
+    width: 630px;
+    height: 390px;
+    background: #0c0c10;
+    border-radius: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+      0 0 0 8px #101014,
+      0 0 0 14px #08080c,
+      0 0 60px rgba(20,30,70,0.25);
+    /* very slow sad sway */
+    animation: sadSway 6s ease-in-out infinite alternate;
+  }
+  @keyframes sadSway {
+    from { transform: rotate(-1deg) translateY(1px); }
+    to   { transform: rotate(0.5deg) translateY(4px); }
+  }
+
+  /* Ears — one drooped, one twitching sadly */
+  .ears {
+    position: absolute;
+    top: -58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 30;
+  }
+  .ear {
+    width: 0; height: 0;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+    border-bottom: 80px solid #0c0c10;
+    position: relative;
+    transform-origin: bottom center;
+  }
+  .ear-left  {
+    transform: rotate(-20deg);
+    animation: earSadL 4s ease-in-out infinite alternate;
+  }
+  .ear-right {
+    transform: rotate(15deg);
+    animation: earSadR 5s ease-in-out infinite alternate;
+  }
+  .ear::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -28px;
+    width: 0; height: 0;
+    border-left: 28px solid transparent;
+    border-right: 28px solid transparent;
+    border-bottom: 44px solid #080610;
+  }
+  @keyframes earSadL {
+    from { transform: rotate(-22deg); }
+    to   { transform: rotate(-14deg); }
+  }
+  @keyframes earSadR {
+    from { transform: rotate(18deg); }
+    to   { transform: rotate(10deg); }
+  }
+
+  .screen {
+    width: 584px;
+    height: 355px;
+    background: #000002;
+    border-radius: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,255,0.009) 3px, rgba(255,255,255,0.009) 4px
+    );
+    pointer-events: none;
+    z-index: 50;
+    border-radius: 42px;
+  }
+
+  .face-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Rain drops on screen */
+  .rain-layer {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 45;
+    overflow: hidden;
+    border-radius: 42px;
+  }
+  .drop {
+    position: absolute;
+    width: 1.5px;
+    background: linear-gradient(to bottom, transparent, rgba(150,170,230,0.4));
+    border-radius: 2px;
+    animation: rainFall linear infinite;
+  }
+  /* Generate several drops via nth-child positioning */
+  .drop:nth-child(1)  { left: 8%;  height: 28px; animation-duration: 1.4s; animation-delay: 0s;    top: -30px; }
+  .drop:nth-child(2)  { left: 18%; height: 20px; animation-duration: 1.7s; animation-delay: 0.3s;  top: -30px; }
+  .drop:nth-child(3)  { left: 30%; height: 32px; animation-duration: 1.2s; animation-delay: 0.8s;  top: -30px; }
+  .drop:nth-child(4)  { left: 45%; height: 24px; animation-duration: 1.5s; animation-delay: 0.1s;  top: -30px; }
+  .drop:nth-child(5)  { left: 58%; height: 18px; animation-duration: 1.8s; animation-delay: 0.6s;  top: -30px; }
+  .drop:nth-child(6)  { left: 70%; height: 30px; animation-duration: 1.3s; animation-delay: 0.4s;  top: -30px; }
+  .drop:nth-child(7)  { left: 82%; height: 22px; animation-duration: 1.6s; animation-delay: 0.9s;  top: -30px; }
+  .drop:nth-child(8)  { left: 93%; height: 26px; animation-duration: 1.45s; animation-delay: 0.2s; top: -30px; }
+  .drop:nth-child(9)  { left: 25%; height: 16px; animation-duration: 1.9s; animation-delay: 0.55s; top: -30px; }
+  .drop:nth-child(10) { left: 62%; height: 28px; animation-duration: 1.35s; animation-delay: 0.75s; top: -30px; }
+  .drop:nth-child(11) { left: 12%; height: 20px; animation-duration: 1.55s; animation-delay: 1.1s;  top: -30px; }
+  .drop:nth-child(12) { left: 77%; height: 24px; animation-duration: 1.65s; animation-delay: 0.35s; top: -30px; }
+
+  @keyframes rainFall {
+    from { transform: translateY(0); opacity: 0.6; }
+    to   { transform: translateY(415px); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel">
+  <div class="ears">
+    <div class="ear ear-left"></div>
+    <div class="ear ear-right"></div>
+  </div>
+
+  <div class="screen" id="screen">
+    <div class="rain-layer">
+      <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+      <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+      <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+      <div class="drop"></div><div class="drop"></div><div class="drop"></div>
+    </div>
+
+    <svg class="face-svg" id="faceSvg"
+         viewBox="0 0 584 355"
+         xmlns="http://www.w3.org/2000/svg">
+
+      <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#060810"/>
+          <stop offset="100%" stop-color="#000002"/>
+        </radialGradient>
+        <clipPath id="eyeClipL">
+          <rect x="62" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <clipPath id="eyeClipR">
+          <rect x="286" y="40" width="236" height="236" rx="118"/>
+        </clipPath>
+        <!-- tear drop filter -->
+        <filter id="tearBlur">
+          <feGaussianBlur stdDeviation="1.5"/>
+        </filter>
+      </defs>
+      <rect width="584" height="355" fill="url(#bgGrad)" rx="42"/>
+
+      <!-- ══ LEFT EYE ══ -->
+      <g id="eyeGroupL">
+        <circle cx="180" cy="165" r="115" fill="white" opacity="0.88"/>
+        <!-- sad grey-blue iris -->
+        <circle cx="180" cy="165" r="72" fill="#4a5580"/>
+        <g id="pupilGroupL">
+          <!-- pupil shifted slightly down-inward (sad gaze) -->
+          <circle cx="174" cy="170" r="50" fill="#030308"/>
+          <!-- smaller gleam, lower shine = looks teary -->
+          <circle cx="190" cy="150" r="12" fill="white" opacity="0.65"/>
+          <circle cx="164" cy="185" r="7"  fill="white" opacity="0.35"/>
+        </g>
+        <!-- Upper lid: covers ~45% — downcast eyes -->
+        <rect x="62" y="40" width="236" height="107"
+              fill="#000002" clip-path="url(#eyeClipL)"/>
+        <!-- Inner brow push-down — sad inner brow fold -->
+        <path d="M 62 147 Q 180 136 298 147"
+              stroke="#000002" stroke-width="7" fill="none"/>
+        <!-- Teary lower rim glistening -->
+        <path d="M 76 240 Q 180 255 284 240"
+              stroke="rgba(160,180,255,0.3)" stroke-width="4" fill="none"/>
+      </g>
+
+      <!-- ══ RIGHT EYE ══ -->
+      <g id="eyeGroupR">
+        <circle cx="404" cy="165" r="115" fill="white" opacity="0.88"/>
+        <circle cx="404" cy="165" r="72" fill="#4a5580"/>
+        <g id="pupilGroupR">
+          <circle cx="398" cy="170" r="50" fill="#030308"/>
+          <circle cx="414" cy="150" r="12" fill="white" opacity="0.65"/>
+          <circle cx="388" cy="185" r="7"  fill="white" opacity="0.35"/>
+        </g>
+        <rect x="286" y="40" width="236" height="107"
+              fill="#000002" clip-path="url(#eyeClipR)"/>
+        <path d="M 286 147 Q 404 136 522 147"
+              stroke="#000002" stroke-width="7" fill="none"/>
+        <path d="M 300 240 Q 404 255 508 240"
+              stroke="rgba(160,180,255,0.3)" stroke-width="4" fill="none"/>
+      </g>
+
+      <!-- ══ EYEBROWS — angled inward/downward on inner side (sad V shape) ══ -->
+      <path id="browL"
+            d="M 116 56 Q 168 44 238 60"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.85"
+            transform="rotate(8, 180, 50)"/>
+      <path id="browR"
+            d="M 346 60 Q 416 44 468 56"
+            stroke="white" stroke-width="7"
+            stroke-linecap="round" fill="none" opacity="0.85"
+            transform="rotate(-8, 404, 50)"/>
+
+      <!-- ══ NOSE ══ -->
+      <polygon points="292,308  278,292  306,292"
+               fill="white" opacity="0.7"/>
+
+      <!-- ══ MOUTH — downward frown / trembling ══ -->
+      <path id="mouthL"
+            d="M 254 328 Q 272 314 292 320"
+            stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.8"/>
+      <path id="mouthR"
+            d="M 330 328 Q 312 314 292 320"
+            stroke="white" stroke-width="5"
+            stroke-linecap="round" fill="none" opacity="0.8"/>
+
+      <!-- ══ TEARS — animated drops ══ -->
+      <!-- Left tear -->
+      <g id="tearGroupL">
+        <ellipse id="tearL" cx="155" cy="258" rx="5" ry="7"
+                 fill="rgba(180,210,255,0.75)" filter="url(#tearBlur)"/>
+      </g>
+      <!-- Right tear -->
+      <g id="tearGroupR">
+        <ellipse id="tearR" cx="428" cy="258" rx="5" ry="7"
+                 fill="rgba(180,210,255,0.75)" filter="url(#tearBlur)"/>
+      </g>
+
+      <!-- ══ WHISKERS — drooped low, slight downward angle ══ -->
+      <line x1="78"  y1="262" x2="-20" y2="252" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+      <line x1="78"  y1="272" x2="-20" y2="278" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+      <line x1="78"  y1="282" x2="-20" y2="308" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+
+      <line x1="506" y1="262" x2="604" y2="252" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+      <line x1="506" y1="272" x2="604" y2="278" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+      <line x1="506" y1="282" x2="604" y2="308" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+
+      <!-- Under-eye shadow bags -->
+      <ellipse cx="180" cy="282" rx="58" ry="10" fill="rgba(0,0,20,0.5)"/>
+      <ellipse cx="404" cy="282" rx="58" ry="10" fill="rgba(0,0,20,0.5)"/>
+
+    </svg>
+  </div>
+</div>
+
+<script>
+const screen  = document.getElementById('screen');
+const pupilL  = document.getElementById('pupilGroupL');
+const pupilR  = document.getElementById('pupilGroupR');
+const faceSvg = document.getElementById('faceSvg');
+const tearL   = document.getElementById('tearL');
+const tearR   = document.getElementById('tearR');
+const mouthL  = document.getElementById('mouthL');
+const mouthR  = document.getElementById('mouthR');
+
+/* Sluggish pupil tracking — sad cat barely looks up */
+let targetOx = 0, targetOy = 0, curOx = 0, curOy = 0;
+document.addEventListener('mousemove', e => {
+  const r  = screen.getBoundingClientRect();
+  const dx = Math.max(-1, Math.min(1, (e.clientX - r.left - r.width/2) / (r.width/2)));
+  const dy = Math.max(-1, Math.min(1, (e.clientY - r.top - r.height/2) / (r.height/2)));
+  targetOx = dx * 7;
+  targetOy = dy * 5 + 4; /* eyes tend to look slightly downward */
+});
+
+/* Slow breathing float */
+let ft = 0;
+(function floatLoop() {
+  ft += 0.010;
+  curOx += (targetOx - curOx) * 0.025;
+  curOy += (targetOy - curOy) * 0.025;
+  pupilL.setAttribute('transform', `translate(${curOx},${curOy})`);
+  pupilR.setAttribute('transform', `translate(${curOx},${curOy})`);
+
+  const dy = Math.sin(ft) * 4 + 1;
+  faceSvg.style.transform = `translateY(${dy}px)`;
+  requestAnimationFrame(floatLoop);
+})();
+
+/* Tear drop animation */
+function animateTear(tearEl, startY) {
+  let y = startY;
+  const startX = parseFloat(tearEl.getAttribute('cx'));
+  let ry = 7;
+  const fall = () => {
+    y += 1.2;
+    ry = Math.max(4, ry - 0.04);
+    tearEl.setAttribute('cy', y);
+    tearEl.setAttribute('ry', ry);
+    const opacity = Math.max(0, 0.75 - (y - startY) / 90);
+    tearEl.setAttribute('fill', `rgba(180,210,255,${opacity})`);
+    if (y < startY + 90) {
+      requestAnimationFrame(fall);
+    } else {
+      /* reset */
+      tearEl.setAttribute('cy', startY);
+      tearEl.setAttribute('ry', 7);
+      tearEl.setAttribute('fill', 'rgba(180,210,255,0)');
+      /* next tear after pause */
+      setTimeout(() => {
+        tearEl.setAttribute('fill', 'rgba(180,210,255,0.75)');
+        setTimeout(() => animateTear(tearEl, startY), 400);
+      }, 2000 + Math.random() * 3000);
+    }
+  };
+  requestAnimationFrame(fall);
+}
+
+/* Start tears at slightly different times */
+setTimeout(() => animateTear(tearL, 258), 1500);
+setTimeout(() => animateTear(tearR, 258), 3200);
+
+/* Slow sad blink */
+let blinking = false;
+function sadBlink() {
+  if (blinking) return;
+  blinking = true;
+  const steps = 20;
+  const topH  = 107;
+  const extraH = 129; /* close to full */
+  let frame = 0, dir = 1;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  const overL = document.createElementNS(svgNS, 'rect');
+  const overR = document.createElementNS(svgNS, 'rect');
+  [['eyeGroupL','62','eyeClipL'], ['eyeGroupR','286','eyeClipR']].forEach(([gid, x, clip], i) => {
+    const el = i === 0 ? overL : overR;
+    el.setAttribute('x', x);
+    el.setAttribute('y', '40');
+    el.setAttribute('width', '236');
+    el.setAttribute('height', topH);
+    el.setAttribute('fill', '#000002');
+    el.setAttribute('clip-path', `url(#${clip})`);
+    document.getElementById(gid).appendChild(el);
+  });
+
+  const tick = () => {
+    frame += dir;
+    const h = topH + Math.round((frame / steps) * extraH);
+    overL.setAttribute('height', Math.min(h, 236));
+    overR.setAttribute('height', Math.min(h, 236));
+
+    if (dir === 1 && frame >= steps) {
+      setTimeout(() => { dir = -1; requestAnimationFrame(tick); }, 250);
+      return;
+    }
+    if (dir === -1 && frame <= 0) {
+      overL.setAttribute('height', topH);
+      overR.setAttribute('height', topH);
+      overL.remove(); overR.remove();
+      blinking = false;
+      setTimeout(sadBlink, 4500 + Math.random() * 3000);
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(sadBlink, 2500);
+
+/* Lip quiver */
+let quiverT = 0;
+(function quiverLoop() {
+  quiverT += 0.06;
+  const q = Math.sin(quiverT * 3.8) * 1.5;
+  mouthL.setAttribute('d', `M ${254+q} ${328+q*0.3} Q ${272} ${314} ${292} ${320}`);
+  mouthR.setAttribute('d', `M ${330-q} ${328+q*0.3} Q ${312} ${314} ${292} ${320}`);
+  requestAnimationFrame(quiverLoop);
+})();
+</script>
+</body>
+</html>
