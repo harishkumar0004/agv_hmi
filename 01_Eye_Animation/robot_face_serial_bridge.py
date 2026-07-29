@@ -19,7 +19,7 @@ Manual system-event test:
 from __future__ import annotations
 
 import argparse
-import mimetypes
+import mimetypes 
 from pathlib import Path
 import queue
 import signal
