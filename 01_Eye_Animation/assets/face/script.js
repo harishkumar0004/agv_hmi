@@ -1,3 +1,4 @@
+let bridge = null;
 (function () {
   "use strict";
 
@@ -8,6 +9,8 @@
   const ears = Array.from(document.querySelectorAll(".ear"));
 
   const EMOTIONS = window.RobotEmotionDefinitions || {};
+  console.log("RobotEmotionDefinitions:", window.RobotEmotionDefinitions);
+  console.log("Available emotions:", Object.keys(EMOTIONS));
   const COMMAND_MAP = {
     NORMAL: "normal",
     HAPPY: "happy",
@@ -429,8 +432,16 @@
     });
 
     document.addEventListener("mouseleave", resetPupils);
+    //clicking in any in the screen trigger to the idle screen.
+    screen.addEventListener("click", () => {
 
-    screen.addEventListener("click", triggerInteractionBurst);
+        triggerInteractionBurst();
+
+        if (bridge) {
+            bridge.onFaceTouched();
+        }
+
+    });
 
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -451,7 +462,13 @@
       }
     });
   }
+  window.playEmotion = function (emotion) {
+      console.log("Emotion requested:", emotion);
 
+      setEmotion(emotion, {
+          source: "python"
+      });
+  };
   function init() {
     if (new URLSearchParams(window.location.search).has("debug")) {
       stage.dataset.debug = "true";
@@ -474,6 +491,10 @@
       emotions: () => Object.keys(EMOTIONS),
       triggers: () => ({ ...TRIGGER_TABLE })
     };
+
+    new QWebChannel(qt.webChannelTransport, function(channel) {
+        bridge = channel.objects.bridge;
+    });
 
     bindEvents();
     connectSerialBridge();
